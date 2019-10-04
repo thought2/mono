@@ -1,6 +1,7 @@
 module Board
   ( init
   , setWord
+  , findWords
   , ErrSetWord(..)
   , prettyPrint
   , Cell
@@ -10,7 +11,7 @@ module Board
   ) where
 
 import Prelude
-import Common (Direction, Size, Step(..), Position)
+import Common (Direction, Position, Size, Step(..), CrossWord)
 import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Either as Either
@@ -94,9 +95,9 @@ setWord startPos step startWord startBoard = foldM trySetStone startBoard indexe
     Right newBoard -> Right newBoard
 
 -- FIND WORD
-findWord :: Position Int -> Step -> Board -> Maybe (Array Char)
+findWord :: Position Int -> Step -> Board -> Maybe String
 findWord posStart step board = case fields of
-  [ Left _, Right _, Right _ ] -> Just $ go posStart []
+  [ Left _, Right _, Right _ ] -> Just $ go posStart ""
   _ -> Nothing
   where
   dir = stepToDirection step
@@ -109,20 +110,21 @@ findWord posStart step board = case fields of
       )
       $ Array.range (-1) 1
 
-  go :: Position Int -> Array Char -> Array Char
+  go :: Position Int -> String -> String
   go pos xs = case getStone pos board of
-    Right char -> go (pos + dir) (xs <> [ char ])
+    Right char -> go (pos + dir) (xs <> fromCharArray [ char ])
     Left _ -> xs
 
-findWords :: Board -> Array { position :: Position Int, step :: Step, word :: Array Char }
+-- FIND WORDS
+findWords :: Board -> Array CrossWord
 findWords board =
   Matrix.toIndexedArray board
     >>= ( \{ position, value } ->
-          foo position LeftRight <> foo position TopDown
+          mkCrossWord position LeftRight <> mkCrossWord position TopDown
       )
   where
-  foo :: Position Int -> Step -> Array { position :: Position Int, step :: Step, word :: Array Char }
-  foo position step =
+  mkCrossWord :: Position Int -> Step -> Array CrossWord
+  mkCrossWord position step =
     maybe []
       ( \word ->
           [ { position, step, word } ]
@@ -131,10 +133,11 @@ findWords board =
 
 -- IS VALID
 data ErrIsValid
-  = ErrIsValidWordNotExist (Array Char)
+  = ErrIsValidWordNotExist String
 
-isValid :: (Array Char -> Boolean) -> Board -> Either ErrIsValid Unit
+isValid :: (String -> Boolean) -> Board -> Either ErrIsValid Unit
 isValid checkWord board =
+  -- TODO use `findWords`
   foldr
     ( \x acc ->
         acc *> checkField x.position

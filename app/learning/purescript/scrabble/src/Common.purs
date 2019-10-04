@@ -3,7 +3,7 @@ module Common where
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Typelevel.Num (D2)
-import Data.Vec (Vec, vec2)
+import Data.Vec (Vec)
 import Prelude (class Show)
 
 type Vec2 a
@@ -22,10 +22,8 @@ data Step
   = LeftRight
   | TopDown
 
-stepToDirection :: Step -> Direction Int
-stepToDirection = case _ of
-  LeftRight -> vec2 1 0
-  TopDown -> vec2 0 1
+type CrossWord
+  = { position :: Position Int, step :: Step, word :: String }
 
 -- INSTANCE
 derive instance genericStep :: Generic Step _
