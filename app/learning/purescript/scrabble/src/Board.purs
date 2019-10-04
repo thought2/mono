@@ -1,38 +1,46 @@
-module Board (init, setWord, ErrSetWord(..), Step(..), pretty, prettyLog) where
+module Board
+  ( init
+  , setWord
+  , ErrSetWord(..)
+  , Step(..)
+  , prettyPrint
+  , Cell
+  , isValid
+  , ErrIsValid
+  , Board
+  ) where
 
 import Prelude
-import Common (Position, Size, Direction)
+import Common (Direction, Size, Position)
+import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Either as Either
-import Data.Foldable (class Foldable, all, foldM)
+import Data.Foldable (class Foldable, foldM, foldr)
 import Data.FunctorWithIndex (class FunctorWithIndex, mapWithIndex)
-import Data.Maybe (Maybe(..), maybe)
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
+import Data.Maybe (Maybe(..))
 import Data.String as String
 import Data.String.CodeUnits (fromCharArray)
 import Data.Tuple.Nested ((/\), type (/\))
 import Data.Vec (vec2)
-import Effect (Effect)
-import Effect.Console as Console
 import Matrix.Extra (Matrix)
 import Matrix.Extra as Matrix
 
 type Board
   = Matrix Cell
 
-type Cell
-  = Maybe Char
-
-data Cell' =
-  Empty | Stone Char
+data Cell
+  = Empty
+  | Stone Char
 
 data Step
   = LeftRight
   | TopDown
 
-
 -- INIT
 init :: Size Int -> Board
-init size = Matrix.repeat size Nothing
+init size = Matrix.repeat size Empty
 
 -- SET STONE
 data ErrSetStone
@@ -43,7 +51,7 @@ data ErrSetStone
 setStone :: Position Int -> Char -> Board -> Either ErrSetStone Board
 setStone pos x mat = case getStone pos mat of
   Left ErrGetStoneOutside -> Left ErrSetStoneOutside
-  Left ErrGetStoneInsideEmpty -> Either.note ErrSetStoneOutside (Matrix.set pos (Just x) mat)
+  Left ErrGetStoneInsideEmpty -> Either.note ErrSetStoneOutside (Matrix.set pos (Stone x) mat)
   Right stone
     | stone == x -> Left ErrSetStoneTakenSame
   Right stone -> Left ErrSetStoneTakenDiff
@@ -56,8 +64,8 @@ data ErrGetStone
 getStone :: Position Int -> Board -> Either ErrGetStone Char
 getStone pos board = case Matrix.get pos board of
   Nothing -> Left ErrGetStoneOutside
-  Just Nothing -> Left ErrGetStoneInsideEmpty
-  Just (Just stone) -> Right stone
+  Just Empty -> Left ErrGetStoneInsideEmpty
+  Just (Stone char) -> Right char
 
 -- SET WORD
 data ErrSetWord
@@ -91,47 +99,72 @@ setWord startPos step startWord startBoard = foldM trySetStone startBoard indexe
     Right newBoard -> Right newBoard
 
 -- FIND WORD
-findWord :: Position Int -> Board -> {leftRight :: Maybe (Array Char), topDown :: Maybe (Array Char)}
-findWord pos board =
-  { leftRight : f LeftRight
-  , topDown : f TopDown
-  }
+findWord :: Position Int -> Step -> Board -> Maybe (Array Char)
+findWord posStart step board = case fields of
+  [ Left _, Right _, Right _ ] -> Just $ go posStart []
+  _ -> Nothing
   where
-    f dir = case {here: Matrix.get pos board, prev: Matrix.get (pos - dir)} of
-      { here : Just (Just _), prev : Nothing , next : Just (Just _) } ->
-      { here : Just (Just _), prev : Just Nothing , next : Just (Just _)} ->
+  dir = stepToDirection step
 
-  case { here: Matrix.get pos board
+  fields :: Array (Either ErrGetStone Char)
+  fields =
+    map
+      ( \i ->
+          getStone (posStart + dir * pure i) board
+      )
+      $ Array.range (-1) 1
 
-  map (\x -> go pos False) (Matrix.get pos board)
-  where
-    go pos b =
-
+  go :: Position Int -> Array Char -> Array Char
+  go pos xs = case getStone pos board of
+    Right char -> go (pos + dir) (xs <> [ char ])
+    Left _ -> xs
 
 -- IS VALID
 data ErrIsValid
   = ErrIsValidWordNotExist (Array Char)
 
 isValid :: (Array Char -> Boolean) -> Board -> Either ErrIsValid Unit
-isValid checkWord board = all isValidCell $ Matrix.toIndexedArray board
+isValid checkWord board =
+  foldr
+    ( \x acc ->
+        acc *> checkField x.position
+    )
+    (pure unit)
+    (Matrix.toIndexedArray board)
   where
-  isValidCell { pos, value } = case findWord pos board of
+  checkField :: Position Int -> Either ErrIsValid Unit
+  checkField pos = checkFieldDir pos LeftRight <* checkFieldDir pos TopDown
+
+  checkFieldDir :: Position Int -> Step -> Either ErrIsValid Unit
+  checkFieldDir pos step = case findWord pos step board of
     Nothing -> pure unit
     Just word
       | checkWord word -> pure unit
     Just word -> Left $ ErrIsValidWordNotExist word
 
--- PRETTY
-pretty :: Board -> String
-pretty board =
+-- PRETTY PRINT
+prettyPrint :: Board -> String
+prettyPrint board =
   Matrix.toArrays board
     # map
         ( \row ->
             row
-              # map (\mayCell -> maybe "." (pure >>> fromCharArray) mayCell)
+              # map
+                  ( \cell -> case cell of
+                      Empty -> "."
+                      Stone char -> fromCharArray [ char ]
+                  )
               # String.joinWith ""
         )
     # String.joinWith "\n"
 
-prettyLog :: Board -> Effect Unit
-prettyLog board = Console.log $ pretty board
+-- INSTANCE
+derive instance genericErrIsValid :: Generic ErrIsValid _
+
+derive instance genericErrSetWord :: Generic ErrSetWord _
+
+instance showErrIsValid :: Show ErrIsValid where
+  show = genericShow
+
+instance showErrSetWord :: Show ErrSetWord where
+  show = genericShow
