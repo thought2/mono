@@ -10,6 +10,7 @@ You can edit this file as you like.
     , "matrices"
     , "maybe"
     , "psci-support"
+    , "test-unit"
     , "tuples"
     , "typelevel"
     , "vectors"
