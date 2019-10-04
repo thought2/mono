@@ -2,7 +2,6 @@ module Board
   ( init
   , setWord
   , ErrSetWord(..)
-  , Step(..)
   , prettyPrint
   , Cell
   , isValid
@@ -11,7 +10,7 @@ module Board
   ) where
 
 import Prelude
-import Common (Direction, Size, Position)
+import Common (Direction, Size, Step(..), Position)
 import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Either as Either
@@ -19,7 +18,7 @@ import Data.Foldable (class Foldable, foldM, foldr)
 import Data.FunctorWithIndex (class FunctorWithIndex, mapWithIndex)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), maybe)
 import Data.String as String
 import Data.String.CodeUnits (fromCharArray)
 import Data.Tuple.Nested ((/\), type (/\))
@@ -33,10 +32,6 @@ type Board
 data Cell
   = Empty
   | Stone Char
-
-data Step
-  = LeftRight
-  | TopDown
 
 -- INIT
 init :: Size Int -> Board
@@ -118,6 +113,21 @@ findWord posStart step board = case fields of
   go pos xs = case getStone pos board of
     Right char -> go (pos + dir) (xs <> [ char ])
     Left _ -> xs
+
+findWords :: Board -> Array { position :: Position Int, step :: Step, word :: Array Char }
+findWords board =
+  Matrix.toIndexedArray board
+    >>= ( \{ position, value } ->
+          foo position LeftRight <> foo position TopDown
+      )
+  where
+  foo :: Position Int -> Step -> Array { position :: Position Int, step :: Step, word :: Array Char }
+  foo position step =
+    maybe []
+      ( \word ->
+          [ { position, step, word } ]
+      )
+      (findWord position step board)
 
 -- IS VALID
 data ErrIsValid
