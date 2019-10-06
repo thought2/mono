@@ -1,10 +1,9 @@
 module Main where
 
 import Prelude
-
 import Effect (Effect)
-import Effect.Console (log)
+import Test.Debug as TestDebug
 
 main :: Effect Unit
 main = do
-  log "🍝"
+  TestDebug.main

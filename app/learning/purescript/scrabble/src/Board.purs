@@ -4,18 +4,16 @@ module Board
   , findWords
   , ErrSetWord(..)
   , prettyPrint
-  , Cell
-  , isValid
-  , ErrIsValid
+  , Cell(..)
   , Board
   ) where
 
 import Prelude
 import Common (Direction, Position, Size, Step(..), CrossWord)
 import Data.Array as Array
-import Data.Either (Either(..))
+import Data.Either (Either(..), either)
 import Data.Either as Either
-import Data.Foldable (class Foldable, foldM, foldr)
+import Data.Foldable (class Foldable, foldM)
 import Data.FunctorWithIndex (class FunctorWithIndex, mapWithIndex)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
@@ -24,6 +22,7 @@ import Data.String as String
 import Data.String.CodeUnits (fromCharArray)
 import Data.Tuple.Nested ((/\), type (/\))
 import Data.Vec (vec2)
+import Debug.Trace (spy)
 import Matrix.Extra (Matrix)
 import Matrix.Extra as Matrix
 
@@ -108,7 +107,7 @@ findWord posStart step board = case fields of
       ( \i ->
           getStone (posStart + dir * pure i) board
       )
-      $ Array.range (-1) 1
+      [ -1, 0, 1 ]
 
   go :: Position Int -> String -> String
   go pos xs = case getStone pos board of
@@ -131,30 +130,6 @@ findWords board =
       )
       (findWord position step board)
 
--- IS VALID
-data ErrIsValid
-  = ErrIsValidWordNotExist String
-
-isValid :: (String -> Boolean) -> Board -> Either ErrIsValid Unit
-isValid checkWord board =
-  -- TODO use `findWords`
-  foldr
-    ( \x acc ->
-        acc *> checkField x.position
-    )
-    (pure unit)
-    (Matrix.toIndexedArray board)
-  where
-  checkField :: Position Int -> Either ErrIsValid Unit
-  checkField pos = checkFieldDir pos LeftRight <* checkFieldDir pos TopDown
-
-  checkFieldDir :: Position Int -> Step -> Either ErrIsValid Unit
-  checkFieldDir pos step = case findWord pos step board of
-    Nothing -> pure unit
-    Just word
-      | checkWord word -> pure unit
-    Just word -> Left $ ErrIsValidWordNotExist word
-
 -- PRETTY PRINT
 prettyPrint :: Board -> String
 prettyPrint board =
@@ -172,12 +147,12 @@ prettyPrint board =
     # String.joinWith "\n"
 
 -- INSTANCE
-derive instance genericErrIsValid :: Generic ErrIsValid _
-
 derive instance genericErrSetWord :: Generic ErrSetWord _
 
-instance showErrIsValid :: Show ErrIsValid where
+instance showErrSetWord :: Show ErrSetWord where
   show = genericShow
 
-instance showErrSetWord :: Show ErrSetWord where
+derive instance genericCell :: Generic Cell _
+
+instance showCell :: Show Cell where
   show = genericShow
