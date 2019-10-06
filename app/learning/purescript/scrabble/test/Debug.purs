@@ -3,16 +3,18 @@ module Test.Debug where
 import Prelude
 import Board (Board)
 import Board as Board
-import Common (Size, Step(..), Vec2, CrossWord)
+import Common (Size, Step(..), Vec2)
 import Control.Monad.Except (ExceptT(..), except, lift, runExceptT, withExceptT)
 import CrissCross (CrissCross)
 import CrissCross as CrissCross
 import Data.Array as Array
-import Data.Either (Either(..))
+import Data.Either (Either(..), either)
 import Data.Either as Either
+import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.List.Lazy as LList
+import Data.Maybe (fromMaybe)
 import Data.String (Pattern(..))
 import Data.String as String
 import Data.Typelevel.Num (d0, d1)
@@ -24,6 +26,8 @@ import Effect.Exception as Exception
 import Effect.Random (randomInt)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync as FS
+import Random.LCG as RandomLCG
+import Test.QuickCheck.Gen as Gen
 
 sampleBoard :: Board
 sampleBoard = Board.init (vec2 3 3)
@@ -55,7 +59,13 @@ randomVec2 start end =
 
 -- SHUFFLE
 shuffle :: forall a. Array a -> Effect (Array a)
-shuffle xs = pure xs -- TODO: add shuffle
+shuffle xs = do
+  seed <- RandomLCG.randomSeed
+  Gen.shuffle xs
+    # Gen.sample seed 1
+    # Array.head
+    # fromMaybe []
+    # pure
 
 -- ADD RANDOM WORD
 data ErrAddRandomWord
@@ -69,19 +79,26 @@ addRandomWord crissCross = do
   words <- lift $ shuffle $ CrissCross.getDict crissCross
   steps <- lift $ shuffle [ LeftRight, TopDown ]
   let
-    allCrossWords :: LList.List CrossWord
-    allCrossWords = do
+    all :: LList.List CrissCross
+    all = do
       word <- LList.fromFoldable words
-      position' <- LList.fromFoldable positions
+      position' <-
+        LList.fromFoldable
+          ( Array.filter
+              ( \pos ->
+                  ((pos !! d0) + String.length word <= (size !! d0))
+                    && ((pos !! d1) + String.length word <= (size !! d1))
+              )
+              positions
+          )
       step <- LList.fromFoldable steps
       let
         position = position' -- TODO: position' - (dir * (length word / 2))
-      pure { position, word, step }
-  allCrossWords
-    # LList.findMap
-        ( \crossWord ->
-            Either.hush $ CrissCross.setWord crossWord crissCross
-        )
+
+        crossWord = { position, word, step }
+      either mempty pure $ CrissCross.setWord crossWord crissCross
+  all
+    # LList.head
     # Either.note ErrAddRandomWordNotPossible
     # except
 
@@ -95,11 +112,10 @@ run config =
   do
     content <- withExceptT ErrRunReadWords $ readTextFile (config.wordsPath)
     let
-      words = Array.take 1000 $ String.split (Pattern "\n") content
-    ( CrissCross.init (config.size) words
-        # (addRandomWord >>> withExceptT (const ErrRunTmp))
-        >>= (addRandomWord >>> withExceptT (const ErrRunTmp))
-        >>= (addRandomWord >>> withExceptT (const ErrRunTmp))
+      words = String.split (Pattern "\n") content
+    ( foldl (>>=)
+        (pure $ CrissCross.init (config.size) words)
+        (Array.replicate config.n $ (addRandomWord >>> withExceptT (const ErrRunTmp)))
     )
     <#> CrissCross.prettyPrint
 
@@ -107,6 +123,7 @@ run config =
 type Config
   = { wordsPath :: String
     , size :: Size Int
+    , n :: Int
     }
 
 main' :: Config -> Effect Unit
@@ -117,7 +134,12 @@ main' config = do
     Right output -> Console.log output
 
 main :: Effect Unit
-main = main' { wordsPath: "./data/wordlist-shuffled.txt", size: vec2 20 30 }
+main =
+  main'
+    { wordsPath: "./data/wordlist-shuffled.txt"
+    , size: vec2 20 30
+    , n: 3
+    }
 
 -- INSTANCE
 derive instance genericErrRun :: Generic ErrRun _

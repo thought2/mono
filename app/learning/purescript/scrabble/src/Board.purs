@@ -9,9 +9,8 @@ module Board
   ) where
 
 import Prelude
-import Common (Direction, Position, Size, Step(..), CrossWord)
-import Data.Array as Array
-import Data.Either (Either(..), either)
+import Common (CrossWord, Position, Size, Step(..), stepToDirection)
+import Data.Either (Either(..))
 import Data.Either as Either
 import Data.Foldable (class Foldable, foldM)
 import Data.FunctorWithIndex (class FunctorWithIndex, mapWithIndex)
@@ -21,8 +20,6 @@ import Data.Maybe (Maybe(..), maybe)
 import Data.String as String
 import Data.String.CodeUnits (fromCharArray)
 import Data.Tuple.Nested ((/\), type (/\))
-import Data.Vec (vec2)
-import Debug.Trace (spy)
 import Matrix.Extra (Matrix)
 import Matrix.Extra as Matrix
 
@@ -66,11 +63,6 @@ getStone pos board = case Matrix.get pos board of
 data ErrSetWord
   = ErrSetWordOutside
   | ErrSetWordMisfit
-
-stepToDirection :: Step -> Direction Int
-stepToDirection = case _ of
-  LeftRight -> vec2 1 0
-  TopDown -> vec2 0 1
 
 setWord ::
   forall f.
@@ -140,7 +132,7 @@ prettyPrint board =
               # map
                   ( \cell -> case cell of
                       Empty -> "."
-                      Stone char -> fromCharArray [ char ]
+                      Stone char -> String.toUpper $ fromCharArray [ char ]
                   )
               # String.joinWith ""
         )
