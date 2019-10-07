@@ -76,8 +76,8 @@ setWord crossWord@{ position, step, word } crissCross@(CrissCross { board, dict 
         Left ErrSetWordSingleChar
       else do
         case Board.setWord position step (toCharArray word) board of
-          Left Board.ErrSetWordOutside -> Left $ ErrSetWordOutside crossWord
           Left Board.ErrSetWordMisfit -> Left $ ErrSetWordMisfit crossWord
+          Left Board.ErrSetWordOutside -> Left $ ErrSetWordOutside crossWord
           Right newBoard -> case isValid { dict, board: newBoard } of
             Right _ -> Right $ CrissCross { board: newBoard, dict }
             Left errIsValid -> Left $ ErrSetWordInvalid errIsValid

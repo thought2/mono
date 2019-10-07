@@ -10,6 +10,7 @@ You can edit this file as you like.
     , "effect"
     , "matrices"
     , "maybe"
+    , "minibench"
     , "node-fs"
     , "node-process"
     , "psci-support"

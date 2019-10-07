@@ -3,21 +3,23 @@ module Test.Debug where
 import Prelude
 import Board (Board)
 import Board as Board
-import Common (Size, Step(..), Vec2)
-import Control.Monad.Except (ExceptT(..), except, lift, runExceptT, withExceptT)
+import Common (Size, Step(..), Vec2, Position)
+import Control.Monad.Except (ExceptT(..), except, lift, mapExceptT, runExceptT, withExceptT)
 import CrissCross (CrissCross)
 import CrissCross as CrissCross
 import Data.Array as Array
 import Data.Either (Either(..), either)
 import Data.Either as Either
-import Data.Foldable (foldl)
+import Data.Foldable (foldl, foldr)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.List.Lazy as LList
-import Data.Maybe (fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (Pattern(..))
 import Data.String as String
+import Data.Tuple as Tuple
 import Data.Typelevel.Num (d0, d1)
+import Data.Typelevel.Undefined (undefined)
 import Data.Vec (vec2, (!!))
 import Effect (Effect)
 import Effect.Console as Console
@@ -26,6 +28,8 @@ import Effect.Exception as Exception
 import Effect.Random (randomInt)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync as FS
+import Partial.Unsafe (unsafePartial)
+import Random.LCG (mkSeed, randomSeed)
 import Random.LCG as RandomLCG
 import Test.QuickCheck.Gen as Gen
 
@@ -71,34 +75,19 @@ shuffle xs = do
 data ErrAddRandomWord
   = ErrAddRandomWordNotPossible
 
-addRandomWord :: CrissCross -> ExceptT ErrAddRandomWord Effect CrissCross
+addRandomWord :: CrissCross -> ExceptT ErrAddRandomWord Gen.Gen CrissCross
 addRandomWord crissCross = do
-  let
-    size = CrissCross.getSize crissCross
-  positions <- lift $ shuffle $ _.position <$> CrissCross.getFields crissCross
-  words <- lift $ shuffle $ CrissCross.getDict crissCross
-  steps <- lift $ shuffle [ LeftRight, TopDown ]
-  let
-    all :: LList.List CrissCross
-    all = do
-      word <- LList.fromFoldable words
-      position' <-
-        LList.fromFoldable
-          ( Array.filter
-              ( \pos ->
-                  ((pos !! d0) + String.length word <= (size !! d0))
-                    && ((pos !! d1) + String.length word <= (size !! d1))
-              )
-              positions
-          )
-      step <- LList.fromFoldable steps
-      let
-        position = position' -- TODO: position' - (dir * (length word / 2))
-
-        crossWord = { position, word, step }
-      either mempty pure $ CrissCross.setWord crossWord crissCross
-  all
-    # LList.head
+  positions <- lift $ Gen.shuffle $ _.position <$> CrissCross.getFields crissCross
+  words <- lift $ Gen.shuffle $ CrissCross.getDict crissCross
+  steps <- lift $ Gen.shuffle [ LeftRight, TopDown ]
+  arrayFindMap3
+    words
+    positions
+    steps
+    ( \word position step ->
+        CrissCross.setWord { word, position, step } crissCross
+          # Either.hush
+    )
     # Either.note ErrAddRandomWordNotPossible
     # except
 
@@ -108,16 +97,53 @@ data ErrRun
   | ErrRunTmp
 
 run :: Config -> ExceptT ErrRun Effect String
-run config =
-  do
-    content <- withExceptT ErrRunReadWords $ readTextFile (config.wordsPath)
-    let
-      words = String.split (Pattern "\n") content
-    ( foldl (>>=)
-        (pure $ CrissCross.init (config.size) words)
-        (Array.replicate config.n $ (addRandomWord >>> withExceptT (const ErrRunTmp)))
-    )
+run config = do
+  content <- withExceptT ErrRunReadWords $ readTextFile (config.wordsPath)
+  let
+    words = String.split (Pattern "\n") content
+  addRandomWord (CrissCross.init (config.size) words)
+    # mapExceptT
+        ( \gen -> do
+            seed <- randomSeed
+            Gen.runGen gen { size: 1, newSeed: seed }
+              # Tuple.fst
+              # pure
+        )
+    # withExceptT (const ErrRunTmp)
     <#> CrissCross.prettyPrint
+
+-- TRY TIMES
+data ErrTryTimes e a
+  = ErrTryTimesNum Int e a
+
+tryTimes :: forall a e. a -> (a -> Either e a) -> Int -> Either (ErrTryTimes e a) a
+tryTimes init f n = go init n
+  where
+  go :: a -> Int -> Either (ErrTryTimes e a) a
+  go x 0 = Right x
+
+  go x i = case f x of
+    Left e -> Left $ ErrTryTimesNum i e x
+    Right x -> go x (i - 1)
+
+-- ARRAY FIND 3
+arrayFindMap3 ::
+  forall a b c d.
+  Array a -> Array b -> Array c -> (a -> b -> c -> Maybe d) -> Maybe d
+arrayFindMap3 xs1 xs2 xs3 f =
+  Array.findMap
+    ( \x1 ->
+        Array.findMap
+          ( \x2 ->
+              Array.findMap
+                ( \x3 ->
+                    f x1 x2 x3
+                )
+                xs3
+          )
+          xs2
+    )
+    xs1
 
 -- MAIN
 type Config
