@@ -4,7 +4,8 @@ import Prelude
 import Board (Board)
 import Board as Board
 import Common (Size, Step(..), Vec2, Position)
-import Control.Monad.Except (ExceptT(..), except, lift, mapExceptT, runExceptT, withExceptT)
+import Control.Monad.Error.Class (class MonadError, class MonadThrow, try)
+import Control.Monad.Except (ExceptT(..), except, lift, mapExceptT, runExceptT, throwError, withExceptT)
 import CrissCross (CrissCross)
 import CrissCross as CrissCross
 import Data.Array as Array
@@ -23,7 +24,6 @@ import Data.Typelevel.Undefined (undefined)
 import Data.Vec (vec2, (!!))
 import Effect (Effect)
 import Effect.Console as Console
-import Effect.Exception (try)
 import Effect.Exception as Exception
 import Effect.Random (randomInt)
 import Node.Encoding (Encoding(..))
@@ -91,41 +91,6 @@ addRandomWord crissCross = do
     # Either.note ErrAddRandomWordNotPossible
     # except
 
--- RUN
-data ErrRun
-  = ErrRunReadWords ErrReadTextFile
-  | ErrRunTmp
-
-run :: Config -> ExceptT ErrRun Effect String
-run config = do
-  content <- withExceptT ErrRunReadWords $ readTextFile (config.wordsPath)
-  let
-    words = String.split (Pattern "\n") content
-  addRandomWord (CrissCross.init (config.size) words)
-    # mapExceptT
-        ( \gen -> do
-            seed <- randomSeed
-            Gen.runGen gen { size: 1, newSeed: seed }
-              # Tuple.fst
-              # pure
-        )
-    # withExceptT (const ErrRunTmp)
-    <#> CrissCross.prettyPrint
-
--- TRY TIMES
-data ErrTryTimes e a
-  = ErrTryTimesNum Int e a
-
-tryTimes :: forall a e. a -> (a -> Either e a) -> Int -> Either (ErrTryTimes e a) a
-tryTimes init f n = go init n
-  where
-  go :: a -> Int -> Either (ErrTryTimes e a) a
-  go x 0 = Right x
-
-  go x i = case f x of
-    Left e -> Left $ ErrTryTimesNum i e x
-    Right x -> go x (i - 1)
-
 -- ARRAY FIND 3
 arrayFindMap3 ::
   forall a b c d.
@@ -144,6 +109,41 @@ arrayFindMap3 xs1 xs2 xs3 f =
           xs2
     )
     xs1
+
+-- TRY TIMES
+tryTimes ::
+  forall a e m n.
+  MonadError e m =>
+  (a -> m a) -> Int -> a -> m a
+tryTimes f 0 x = pure x
+
+tryTimes f i x =
+  try (f x)
+    >>= case _ of
+        Left err -> throwError err
+        Right ok -> tryTimes f (i - 1) ok
+
+-- RUN
+data ErrRun
+  = ErrRunReadWords ErrReadTextFile
+  | ErrRunTmp
+
+run :: Config -> ExceptT ErrRun Effect String
+run config = do
+  content <- withExceptT ErrRunReadWords $ readTextFile (config.wordsPath)
+  let
+    words = String.split (Pattern "\n") content
+  (CrissCross.init (config.size) words)
+    # tryTimes addRandomWord config.n
+    # mapExceptT
+        ( \gen -> do
+            seed <- randomSeed
+            Gen.runGen gen { size: 1, newSeed: seed }
+              # Tuple.fst
+              # pure
+        )
+    # withExceptT (const ErrRunTmp)
+    <#> CrissCross.prettyPrint
 
 -- MAIN
 type Config
