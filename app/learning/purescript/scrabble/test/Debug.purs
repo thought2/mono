@@ -1,48 +1,25 @@
 module Test.Debug where
 
 import Prelude
-import Board (Board)
-import Board as Board
-import Common (Size, Step(..), Vec2, Position)
-import Control.Monad.Error.Class (class MonadError, class MonadThrow, try)
-import Control.Monad.Except (ExceptT(..), except, lift, mapExceptT, runExceptT, throwError, withExceptT)
-import CrissCross (CrissCross)
+import Common (Size)
+import Control.Monad.Error.Class (try)
+import Control.Monad.Except (ExceptT(..), mapExceptT, runExceptT, withExceptT)
 import CrissCross as CrissCross
-import Data.Array as Array
-import Data.Either (Either(..), either)
-import Data.Either as Either
-import Data.Foldable (foldl, foldr)
+import CrissCross.Gen (addRandomWord, tryTimes)
+import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
-import Data.List.Lazy as LList
-import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (Pattern(..))
 import Data.String as String
 import Data.Tuple as Tuple
-import Data.Typelevel.Num (d0, d1)
-import Data.Typelevel.Undefined (undefined)
-import Data.Vec (vec2, (!!))
+import Data.Vec (vec2)
 import Effect (Effect)
-import Effect.Console as Console
+import Effect.Class.Console as Console
 import Effect.Exception as Exception
-import Effect.Random (randomInt)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync as FS
-import Partial.Unsafe (unsafePartial)
-import Random.LCG (mkSeed, randomSeed)
-import Random.LCG as RandomLCG
+import Random.LCG (randomSeed)
 import Test.QuickCheck.Gen as Gen
-
-sampleBoard :: Board
-sampleBoard = Board.init (vec2 3 3)
-
-prettyLog :: Board -> Effect Unit
-prettyLog board = Console.log $ Board.prettyPrint board
-
-prettyLog' :: forall err. Show err => Either err Board -> Effect Unit
-prettyLog' eitherBoard = case eitherBoard of
-  Left err -> Console.log (show err)
-  Right board -> Console.log $ Board.prettyPrint board
 
 -- READ TEXT FILE
 data ErrReadTextFile
@@ -53,75 +30,6 @@ readTextFile path =
   try (FS.readTextFile UTF8 path)
     # ExceptT
     # withExceptT (\nativeErr -> ErrReadTextFile { path, nativeErr })
-
--- RANDOM VEC 2
-randomVec2 :: Vec2 Int -> Vec2 Int -> Effect (Vec2 Int)
-randomVec2 start end =
-  vec2
-    <$> randomInt (start !! d0) (end !! d0)
-    <*> randomInt (start !! d1) (end !! d1)
-
--- SHUFFLE
-shuffle :: forall a. Array a -> Effect (Array a)
-shuffle xs = do
-  seed <- RandomLCG.randomSeed
-  Gen.shuffle xs
-    # Gen.sample seed 1
-    # Array.head
-    # fromMaybe []
-    # pure
-
--- ADD RANDOM WORD
-data ErrAddRandomWord
-  = ErrAddRandomWordNotPossible
-
-addRandomWord :: CrissCross -> ExceptT ErrAddRandomWord Gen.Gen CrissCross
-addRandomWord crissCross = do
-  positions <- lift $ Gen.shuffle $ _.position <$> CrissCross.getFields crissCross
-  words <- lift $ Gen.shuffle $ CrissCross.getDict crissCross
-  steps <- lift $ Gen.shuffle [ LeftRight, TopDown ]
-  arrayFindMap3
-    words
-    positions
-    steps
-    ( \word position step ->
-        CrissCross.setWord { word, position, step } crissCross
-          # Either.hush
-    )
-    # Either.note ErrAddRandomWordNotPossible
-    # except
-
--- ARRAY FIND 3
-arrayFindMap3 ::
-  forall a b c d.
-  Array a -> Array b -> Array c -> (a -> b -> c -> Maybe d) -> Maybe d
-arrayFindMap3 xs1 xs2 xs3 f =
-  Array.findMap
-    ( \x1 ->
-        Array.findMap
-          ( \x2 ->
-              Array.findMap
-                ( \x3 ->
-                    f x1 x2 x3
-                )
-                xs3
-          )
-          xs2
-    )
-    xs1
-
--- TRY TIMES
-tryTimes ::
-  forall a e m n.
-  MonadError e m =>
-  (a -> m a) -> Int -> a -> m a
-tryTimes f 0 x = pure x
-
-tryTimes f i x =
-  try (f x)
-    >>= case _ of
-        Left err -> throwError err
-        Right ok -> tryTimes f (i - 1) ok
 
 -- RUN
 data ErrRun
