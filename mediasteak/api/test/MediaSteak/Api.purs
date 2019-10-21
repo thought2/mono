@@ -2,49 +2,67 @@ module Test.MediaSteak.Api where
 
 import Prelude
 import Control.Alt ((<|>))
-import Control.Monad.Except (ExceptT, except, withExceptT)
+import Control.Monad.Except (ExceptT(..), except, mapExceptT, runExceptT, withExceptT)
 import Data.Array as Array
+import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
 import Data.FunctorWithIndex (mapWithIndex)
 import Data.Identity (Identity)
 import Data.Int (odd)
 import Data.Int as Int
 import Data.Maybe (maybe)
+import Data.Newtype (class Newtype, unwrap)
 import Data.String as String
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags as RegexFlags
 import Data.String.Regex.Unsafe as RegexUnsafe
+import Debug.Trace (spy)
+import Effect (Effect)
 import MediaSteak.Api (ErrGet, MediaItem)
 import MediaSteak.Api as Api
+import Partial.Unsafe (unsafePartial)
+import Test.QuickCheck (class Arbitrary, arbitrary)
+import Test.QuickCheck.Gen (Gen)
+import Test.QuickCheck.Gen as Gen
 import Text.Parsing.StringParser (Parser, runParser)
 import Text.Parsing.StringParser as StringParser
 import Text.Parsing.StringParser.CodeUnits (eof, string, regex)
 
 newtype Mock a
-  = Mock (Identity a)
+  = Mock (Gen a)
 
-type MockConfig
-  = { mediaItems :: Array MediaItem, nPages :: Int }
+newtype MockConfig
+  = MockConfig { mediaItems :: Array MediaItem, nPages :: Int }
 
-mockParseInt :: Parser Int
-mockParseInt = regex "\\d+" >>= (maybe (StringParser.fail "Expected an integer.") pure <<< Int.fromString)
+run :: forall a. ExceptT ErrGet Mock a -> Effect (Either Api.ErrGet a)
+run m = (Gen.randomSample $ unwrap $ runExceptT m) <#> (\xs -> unsafePartial $ Array.unsafeIndex xs 0)
 
-mock :: MockConfig -> String -> ExceptT ErrGet Mock String
-mock { mediaItems, nPages } path = do
+mock :: MockConfig -> String -> Either ErrGet String
+mock (MockConfig { mediaItems, nPages }) path = do
   let
+    _ = spy "nPages" nPages
+
+    _ = spy "len" $ Array.length mediaItems
+
     parsePath =
-      (string "aktuell/page/" *> mockParseInt <* string "/" <* eof)
+      (string "aktuell/page/" *> parseInt <* string "/" <* eof)
         <|> (string "aktuell/" <* eof <#> (const 1))
-  index <- runParser parsePath path # except # withExceptT (const Api.ErrGet)
+  index <- runParser parsePath path # lmap (const Api.ErrGet)
   let
     startIndex = index * itemsPerPage
 
     endIndex = startIndex + itemsPerPage
   case Array.slice startIndex endIndex mediaItems of
-    [] -> except $ Left Api.ErrGet
+    [] -> Left Api.ErrGet
     slice -> pure $ mockPage { mediaItems: slice, nPages }
   where
   itemsPerPage = Array.length mediaItems `div` nPages
+
+  parseInt :: Parser Int
+  parseInt =
+    regex "\\d+"
+      <#> Int.fromString
+      >>= (maybe (StringParser.fail "Expected an integer") pure)
 
 mockPage :: { mediaItems :: Array MediaItem, nPages :: Int } -> String
 mockPage { mediaItems, nPages } =
@@ -149,5 +167,17 @@ derive newtype instance applicativeMock :: Applicative Mock
 
 derive newtype instance functorMock :: Functor Mock
 
+derive instance newtypeMock :: Newtype (Mock a) _
+
+derive instance newtypeMockConfig :: Newtype MockConfig _
+
+-- instance ioMock :: Api.IO Mock where
+--   get url = pure "return"
 instance ioMock :: Api.IO Mock where
-  get url = pure "return"
+  get url = mapExceptT Mock $ ExceptT $ arbitrary <#> \config -> mock config url
+
+instance arbitraryMockConfig :: Arbitrary MockConfig where
+  arbitrary = do
+    mediaItems <- arbitrary
+    nPages <- Gen.chooseInt 1 (Array.length mediaItems)
+    pure $ MockConfig { mediaItems, nPages }

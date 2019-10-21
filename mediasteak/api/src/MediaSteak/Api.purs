@@ -2,6 +2,8 @@ module MediaSteak.Api where
 
 import Prelude
 import Control.Monad.Except (ExceptT)
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
 import Partial.Unsafe (unsafeCrashWith)
 
 type MediaItem
@@ -18,9 +20,11 @@ type Minutes
 data ErrGet
   = ErrGet
 
+derive instance genericErrGet :: Generic ErrGet _
+
+instance showErrGet :: Show ErrGet where
+  show = genericShow
+
 class
   Monad m <= IO m where
   get :: String -> ExceptT ErrGet m String
-
-getItems :: forall m. m (Array MediaItem)
-getItems = unsafeCrashWith "getItems"

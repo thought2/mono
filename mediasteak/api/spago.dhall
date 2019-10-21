@@ -6,14 +6,17 @@ You can edit this file as you like.
     "mediasteak-api"
 , dependencies =
     [ "console"
+    , "debug"
     , "effect"
+    , "generics-rep"
     , "partial"
     , "psci-support"
+    , "quickcheck"
     , "string-parsers"
     , "transformers"
     ]
 , packages =
-    ./packages.dhall
+    ./../../packages.dhall
 , sources =
     [ "src/**/*.purs", "test/**/*.purs" ]
 }
