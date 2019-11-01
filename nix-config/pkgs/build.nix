@@ -272,9 +272,7 @@ rec {
 
     cd $DIR
 
-    cp -r $DEV_DIR/nix-config .
-    cp -r $DEV_DIR/private-config .
-    cp -r $DEV_DIR/coya-config .
+    cp -r $DEV_DIR/mono
 
     # @TODO: check root here
     nixos-generate-config --force # --root $ROOT

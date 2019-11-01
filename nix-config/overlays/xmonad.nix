@@ -1,4 +1,4 @@
-{pkgs ? import <nixpkgs> {} , shorthands, sources ? import ../nix/sources.nix}:
+{pkgs ? import <nixpkgs> {} , shorthands}:
 let
   config =
     { colors =
@@ -26,7 +26,7 @@ let
     with pkgs;
     with stdenv;
     with haskellPackages;
-    import "${sources.mono}/xmonad-custom/default.nix" {
+    import ../../xmonad-custom/default.nix  {
       inherit
         mkDerivation
         base
