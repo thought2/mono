@@ -21,6 +21,13 @@ import           XMonad.StackSet                      (RationalRect (RationalRec
 import           XMonad.Util.EZConfig                 (additionalKeysP)
 import           XMonadCustom.EnvConfig
 
+import           XMonad.Hooks.FadeInactive
+
+myLogHook :: X ()
+myLogHook = fadeInactiveLogHook fadeAmount
+    where fadeAmount = 0.8
+
+
 modm = mod4Mask
 
 makeConfig envConfig =
@@ -31,6 +38,7 @@ makeConfig envConfig =
     , layoutHook = layout
     , manageHook = myManageHook
     , startupHook = setWMName "LG3D"
+    , logHook = myLogHook
     } `additionalKeysP`
   (shortcuts $ tools envConfig)
 

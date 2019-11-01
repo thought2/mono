@@ -272,7 +272,7 @@ rec {
 
     cd $DIR
 
-    cp -r $DEV_DIR/mono
+    cp -r $DEV_DIR/mono .
 
     # @TODO: check root here
     nixos-generate-config --force # --root $ROOT

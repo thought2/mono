@@ -2,7 +2,7 @@
 with pkgs;
 {
   imports =
-    [ /etc/nixos/hardware-configuration.nix
+    [ ../../../../hardware-configuration.nix
     ];
 
   environment.systemPackages = [
