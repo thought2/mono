@@ -57,7 +57,7 @@ let
       repos = [
         {
           url = repoUrl;
-          name = "nix-config";
+          name = "mono";
           branch = "master";
         }
         {
@@ -67,7 +67,7 @@ let
         }
       ];
       url = "";
-      entry = "nix-config/hosts/${name}.nix";
+      entry = "mono/nix-config/hosts/${name}.nix";
     };
     prod = rec {
       name = "prod";
