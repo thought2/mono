@@ -1,0 +1,9 @@
+.nrepl-history
+*.log
+target/
+result
+elm-stuff
+~*
+node_modules
+tmp
+.stack-work

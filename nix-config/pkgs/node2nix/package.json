@@ -1,0 +1,18 @@
+[
+    "mustache-cli",
+    "chalk-cli",
+    "elm-format",
+    "elm-oracle",
+    "elm-live",
+    "elm-test",
+    "cross-env",
+    "create-elm-app",
+    "pulp",
+    "selenium-webdriver",
+    "ts-node",
+    "yargs",
+    "localtunnel",
+    "pre-commit",
+    "elm-doc-preview",
+    "http-server"
+]
