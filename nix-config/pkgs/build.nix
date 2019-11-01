@@ -203,9 +203,7 @@ rec {
         ;;
     esac
 
-    nixos-generate-config \
-      --force \
-      `[ "$ROOT" ] && echo "--root $ROOT"`
+    nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
   '';
 
   machine-deploy-workdir = writeShellScriptBin "machine-deploy-workdir" ''
