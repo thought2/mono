@@ -39,8 +39,8 @@ with lib;
       sessionCommands = ''
         ${pkgs.xorg.xmodmap}/bin/xmodmap /etc/Xmodmap
       '';
-      };
-
+      lightdm.background = "";
+    };
   };
 
   # Todo: this should work with an overlay as well
@@ -96,5 +96,14 @@ with lib;
     latitude = "0";
     longitude = "0";
     extraOptions = ["-x" "-o" "-P" "-O 3000" "-b 0.8"];
+  };
+
+  systemd.user.services.xcompmgr = {
+    serviceConfig = {
+      ExecStart = "${pkgs.xcompmgr}/bin/xcompmgr -F -f";
+      Restart = "always";
+    };
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
   };
 }
