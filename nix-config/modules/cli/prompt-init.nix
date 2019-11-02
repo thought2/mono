@@ -14,8 +14,8 @@ let
     STYLE=$1
     COLOR=$2
     CONTENT=$3
-    OPEN_FACE="\033[$STYLE;$COLOR"
-    CLOSE_FACE="\033[0m"
+    OPEN_FACE="\[\033[$STYLE;$COLOR\]"
+    CLOSE_FACE="\[\033[00m\]"
     echo -e $OPEN_FACE$CONTENT$CLOSE_FACE
   '';
 in
@@ -35,22 +35,21 @@ in
     withFace=${withFace}/bin/with-face
 
     # MAIN
+
     if [ "$UID" -eq 0 ]
     then
-      COLOR=$RED
+      COLOR="$RED"
       SIGN='#'
     else
-      COLOR=$BLUE
+      COLOR="$BLUE"
       SIGN='$'
     fi
 
-    NL='\n'
     INFO=`${withFace}/bin/with-face $BOLD $COLOR "[\u:\h:\w]"`
     GIT_INFO='$(${getGitInfo}/bin/get-git-info "(%s)")'
     GIT_INFO=`${withFace}/bin/with-face $NORMAL $COLOR "$GIT_INFO"`
-    SIGN=`${withFace}/bin/with-face $BOLD $COLOR $SIGN`
-    SPACE=' '
+    SIGN=`${withFace}/bin/with-face $BOLD $COLOR "$SIGN"`
 
-    PS1="$NL$INFO$GIT_INFO$NL$SIGN$SPACE"
+    PS1="\n$INFO$GIT_INFO\n$SIGN "
   '';
 }
