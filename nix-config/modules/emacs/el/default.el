@@ -64,13 +64,34 @@
   (blink-cursor-mode 0)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
-  (scroll-bar-mode -1))
+  (scroll-bar-mode -1)
+  )
+
+(progn
+
+  (add-to-list 'initial-frame-alist '(background-color . "black"))
+  (add-to-list 'default-frame-alist '(background-color . "black"))
+
+  (load-theme 'wombat)
+
+  (set-background-color "black")
+
+  (custom-theme-set-faces
+   'wombat
+   '(fringe ((t (:background "#101010" :foreground "#101010"))))
+   '(vertical-border ((t (:background "#101010" :foreground "#101010"))))
+
+   ))
 
 (progn
   (when (display-graphic-p)
-    (fringe-mode 4)
+    (set-fringe-mode '(8 . 0))
 
-    (set-fringe-mode 8)
+    (set-face-attribute 'fringe nil
+			:foreground "#101010"
+			:background "#101010")
+
+    ;;(set-fringe-mode 8)
 
     (define-fringe-bitmap 'right-curly-arrow
       [#b00000000
@@ -843,56 +864,56 @@ with word around mark."
   (global-set-key (kbd "C-'") 'avy-goto-char-2)
   (global-set-key (kbd "C-.") 'avy-goto-char-timer))
 
-(progn
+;; (progn
 
-  (deftheme my-light
-    "Created 2018-04-17.")
+;;   (deftheme my-light
+;;     "Created 2018-04-17.")
 
-  (setq visible-bell nil)
+;;   (setq visible-bell nil)
 
-  (custom-theme-set-faces
-   'my-light
+;;   (custom-theme-set-faces
+;;    'my-light
 
-   '(whitespace-line ((t (:background "grey90"))))
+;;    '(whitespace-line ((t (:background "grey90"))))
 
-   '(fringe ((t (:background "grey100"))))
+;;    '(fringe ((t (:background "grey100"))))
 
-   '(avy-lead-face
-     ((t (:background "goldenrod" :foreground "white"))))
+;;    '(avy-lead-face
+;;      ((t (:background "goldenrod" :foreground "white"))))
 
-   '(avy-lead-face-0
-     ((t (:background "steel blue" :foreground "white"))))
-   '(helm-ff-dotted-directory
-     ((t (:background "dark gray" :foreground "black"))))
+;;    '(avy-lead-face-0
+;;      ((t (:background "steel blue" :foreground "white"))))
+;;    '(helm-ff-dotted-directory
+;;      ((t (:background "dark gray" :foreground "black"))))
 
-   '(helm-selection
-     ((t (:background "seashell2" :distant-foreground "black"))))
+;;    '(helm-selection
+;;      ((t (:background "seashell2" :distant-foreground "black"))))
 
-   '(helm-source-header
-     ((t (:background "azure2" :foreground "black" :box (:line-width 2 :color "azure2") :weight bold :height 1.0))))
+;;    '(helm-source-header
+;;      ((t (:background "azure2" :foreground "black" :box (:line-width 2 :color "azure2") :weight bold :height 1.0))))
 
-   '(isearch
-     ((t (:background "violet" :foreground "lightskyblue1"))))
+;;    '(isearch
+;;      ((t (:background "violet" :foreground "lightskyblue1"))))
 
-   '(helm-source-header
-     ((t (:background "azure2" :foreground "black" :box (:line-width 2 :color "azure2") :weight bold :height 1.0)))))
+;;    '(helm-source-header
+;;      ((t (:background "azure2" :foreground "black" :box (:line-width 2 :color "azure2") :weight bold :height 1.0)))))
 
-  (provide-theme 'my-light)
+;;   (provide-theme 'my-light)
 
-  (defun theme-dark ()
-    (interactive)
-    (load-theme 'zenburn)
+;;   (defun theme-dark ()
+;;     (interactive)
+;;     (load-theme 'zenburn)
 
-    (custom-theme-set-faces
-     'zenburn
-     '(highlight-indentation-face ((t (:background "grey27"))))
-     '(fringe ((t (:background "grey30"))))
-     '(vertical-border ((t (:foreground "grey25"))))
-     '(helm-selection ((t (:background "seashell3" :underline nil))))))
+;;     (custom-theme-set-faces
+;;      'zenburn
+;;      '(highlight-indentation-face ((t (:background "grey27"))))
+;;      '(fringe ((t (:background "grey30"))))
+;;      '(vertical-border ((t (:foreground "grey25"))))
+;;      '(helm-selection ((t (:background "seashell3" :underline nil))))))
 
-  (defun theme-light ()
-    (interactive)
-    (load-theme 'my-light)))
+;;   (defun theme-light ()
+;;     (interactive)
+;;     (load-theme 'my-light)))
 
 
 (require 'darkroom)
@@ -1686,7 +1707,7 @@ buffer is not visiting a file."
 (progn
   (require 'fill-column-indicator)
   (setq fci-rule-column 80)
-  (setq fci-rule-color "gainsboro")
+  (setq fci-rule-color "#303030")
   (setq fci-rule-width 1))
 
 (defun xah-copy-file-path (&optional @dir-path-only-p)
@@ -1823,3 +1844,5 @@ Version 2017-09-01"
 	    #'(lambda ()
 		(dirtrack-mode 1)
 		)))
+
+(set-background-color "black")
