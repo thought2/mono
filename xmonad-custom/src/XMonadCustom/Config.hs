@@ -25,7 +25,7 @@ import           XMonad.Hooks.FadeInactive
 
 myLogHook :: X ()
 myLogHook = fadeInactiveLogHook fadeAmount
-    where fadeAmount = 0.8
+    where fadeAmount = 0.2
 
 
 modm = mod4Mask
@@ -33,7 +33,7 @@ modm = mod4Mask
 makeConfig envConfig =
   defaultConfig
     { focusedBorderColor = border $ colors envConfig
-    , borderWidth = 4
+    , borderWidth = 0
     , modMask = modm
     , layoutHook = layout
     , manageHook = myManageHook
