@@ -37,7 +37,7 @@ lib.flatten (builtins.attrValues {
     rofi
     zathura
     # playonlinux
-    xfce4-13.thunar
+    xfce.thunar
     libreoffice
   ];
 
@@ -65,7 +65,7 @@ lib.flatten (builtins.attrValues {
     chamber
     nailgun
     gitAndTools.pre-commit
-    stack2nix
+    # stack2nix broken?
     dhall
     awscli
     aws-vault
@@ -144,7 +144,7 @@ lib.flatten (builtins.attrValues {
 
   nix = [
     nixops
-    npm2nix
+    # npm2nix
     nix-prefetch-git
     # cabal2nix
     nodePackages.node2nix

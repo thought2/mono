@@ -91,12 +91,12 @@ with lib;
       # ${pkgs.i3lock}/bin/i3lock
     '';
 
-  services.redshift = {
-    enable = true;
-    latitude = "0";
-    longitude = "0";
-    extraOptions = ["-x" "-o" "-P" "-O 3000" "-b 0.8"];
-  };
+  # services.redshift = {
+  #   enable = true;
+  #   latitude = 0;
+  #   longitude = 0;
+  #   extraOptions = ["-x" "-o" "-P" "-O 3000" "-b 0.8"];
+  # };
 
   systemd.user.services.xcompmgr = {
     serviceConfig = {
