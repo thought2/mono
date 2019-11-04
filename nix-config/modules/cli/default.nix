@@ -24,6 +24,7 @@ in
 
   environment.variables = {
     NIXOS_ROOT = "/etc/nixos";
+    URL_GITHUB = "git@github.com";
   };
 
   environment.interactiveShellInit = ''
