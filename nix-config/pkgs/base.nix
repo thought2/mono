@@ -4,9 +4,9 @@ with import ../util;
 
 let
 
-  node2nixPkgs = import ./node2nix {};
+  node2nixPkgs = import ./node2nix { };
 
-  easy-purescript = import ./easy-purescript {};
+  easy-purescript = import ./easy-purescript { };
 
   elmTools = import (pkgs.fetchFromGitHub {
     owner = "turboMaCk";
@@ -15,9 +15,7 @@ let
     sha256 = "1ns02xxj3zijf6myaxk8azgs8v69gpc2b0v080m2xjf1pvv6hd75";
   }) { inherit pkgs; };
 
-in
-
-with pkgs;
+in with pkgs;
 
 lib.flatten (builtins.attrValues {
 
@@ -27,8 +25,7 @@ lib.flatten (builtins.attrValues {
     blackBg = "xsetroot -solid '#000000'";
   };
 
-  custom = [
-  ];
+  custom = [ (import ./monorepo-tools.nix { }).monorepo-tools-add ];
 
   desktop = [
     xorg.xinit
@@ -53,7 +50,7 @@ lib.flatten (builtins.attrValues {
   ];
 
   dev = [
-    (import ./unison.nix {})
+    (import ./unison.nix { })
     jekyll
     bundler
     bundix
@@ -133,14 +130,9 @@ lib.flatten (builtins.attrValues {
     elmTools.elm-verify-examples
     elmTools.elm-analyse
     elmTools.elm-doc-preview
-  ] ++ builtins.attrValues(easy-purescript);
+  ] ++ builtins.attrValues (easy-purescript);
 
-  gfx = [
-    blender
-    imagemagick
-    gimp
-    graphviz
-  ];
+  gfx = [ blender imagemagick gimp graphviz ];
 
   nix = [
     nixops
@@ -150,9 +142,7 @@ lib.flatten (builtins.attrValues {
     nodePackages.node2nix
   ];
 
-  system = [
-    acpi
-  ];
+  system = [ acpi ];
 
   cli = [
     xclip
@@ -190,13 +180,7 @@ lib.flatten (builtins.attrValues {
     usbutils
   ];
 
-  media = [
-    vlc
-    scrot
-    feh
-    espeak
-    sox
-  ];
+  media = [ vlc scrot feh espeak sox ];
 
   office = [
     # libreoffice
@@ -205,16 +189,10 @@ lib.flatten (builtins.attrValues {
     aspell
   ];
 
-  crypto = [
-    gnupg
-  ];
+  crypto = [ gnupg ];
 
-  vm = [
-    virtualbox
-  ];
+  vm = [ virtualbox ];
 
-  security = [
-    clamav
-  ];
+  security = [ clamav ];
 
 })
