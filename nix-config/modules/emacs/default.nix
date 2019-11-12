@@ -45,7 +45,6 @@ let
         indium
         [ yasnippet yasnippet-snippets ]
         elfeed
-        [ ensime sbt-mode ] # scala
         [ ivy-pass helm-pass pass ]
         dictcc
         avy
