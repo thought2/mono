@@ -1,4 +1,4 @@
-{ config, ... }:
+{ sources ? import ../../nix/sources.nix, config, ... }:
 self: super:
 let
   node2nixPkgs = import ../pkgs/node2nix { };
@@ -6,7 +6,14 @@ let
     pkgs = self;
     inherit config;
   };
+
+  easy-purescript = import sources.easy-purescript-nix { };
 in rec {
+
+  purs = easy-purescript.purs;
+  spago = easy-purescript.spago;
+  spago2nix = easy-purescript.spago2nix;
+  purty = easy-purescript.purty;
 
   chamber = super.latestMaster.buildGoModule rec {
     name = "chamber-${version}";

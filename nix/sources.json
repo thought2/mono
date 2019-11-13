@@ -1,4 +1,16 @@
 {
+    "easy-purescript-nix": {
+        "branch": "master",
+        "description": "Easy PureScript (and other tools) with Nix",
+        "homepage": "",
+        "owner": "justinwoo",
+        "repo": "easy-purescript-nix",
+        "rev": "aa94aeac3a6ad9b4dfa0e807ad1421097d74f663",
+        "sha256": "1kfhi6rscgf165zg4f1s0fgppygisvc7dppxb93n02rypxfxjirm",
+        "type": "tarball",
+        "url": "https://github.com/justinwoo/easy-purescript-nix/archive/aa94aeac3a6ad9b4dfa0e807ad1421097d74f663.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "monorepo-tools": {
         "branch": "master",
         "description": "[READ-ONLY] Tools for building and splitting monolithic repository from existing packages (with their history unchanged)",

@@ -6,7 +6,7 @@ let
 
   node2nixPkgs = import ./node2nix { };
 
-  easy-purescript = import ./easy-purescript { };
+  easy-purescript = pkgs.easy-purescript;
 
   elmTools = import (pkgs.fetchFromGitHub {
     owner = "turboMaCk";
@@ -130,7 +130,11 @@ lib.flatten (builtins.attrValues {
     elmTools.elm-verify-examples
     elmTools.elm-analyse
     elmTools.elm-doc-preview
-  ] ++ builtins.attrValues (easy-purescript);
+    purs
+    spago
+    spago2nix
+    purty
+  ];
 
   gfx = [ blender imagemagick gimp graphviz ];
 
