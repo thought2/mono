@@ -46,5 +46,17 @@
         "type": "tarball",
         "url": "https://github.com/NixOS/nixpkgs-channels/archive/ef8c34c4721761af0a9258129cad55be5bd9c696.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "spago2nix": {
+        "branch": "feature/local-pkgs",
+        "description": "Generate a derivation of Spago dependencies, and use them to install them into the directory structure used by Spago.",
+        "homepage": "",
+        "owner": "thought2",
+        "repo": "spago2nix",
+        "rev": "5dded329f61fc732cecbca9d2e354a85f38aefea",
+        "sha256": "1kzv2y970x0vii2pgfhpyg9q77vw3zz9p370z70sqkc6m424j2vb",
+        "type": "tarball",
+        "url": "https://github.com/thought2/spago2nix/archive/5dded329f61fc732cecbca9d2e354a85f38aefea.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

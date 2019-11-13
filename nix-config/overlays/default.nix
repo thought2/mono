@@ -12,7 +12,7 @@ in rec {
 
   purs = easy-purescript.purs;
   spago = easy-purescript.spago;
-  spago2nix = easy-purescript.spago2nix;
+  spago2nix = import sources.spago2nix { };
   purty = easy-purescript.purty;
 
   chamber = super.latestMaster.buildGoModule rec {
