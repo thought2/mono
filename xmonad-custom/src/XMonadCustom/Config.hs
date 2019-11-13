@@ -25,7 +25,7 @@ import           XMonad.Hooks.FadeInactive
 
 myLogHook :: X ()
 myLogHook = fadeInactiveLogHook fadeAmount
-    where fadeAmount = 0.2
+    where fadeAmount = 0.5
 
 
 modm = mod4Mask

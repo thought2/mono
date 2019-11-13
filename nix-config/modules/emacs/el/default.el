@@ -619,7 +619,10 @@ with word around mark."
   ;;(require 'nix-mode)
   ;;(add-to-list 'auto-mode-alist '("\\.nix" . nix-mode))
   (add-hook 'nix-mode-hook #'company-mode)
-  )
+
+  (add-hook 'nix-mode-hook (lambda ()
+			     (add-hook 'before-save-hook 'nix-format-buffer nil t)
+			     )))
 
 
 (progn
@@ -1136,20 +1139,27 @@ the last number is used again in further repeated invocations.
       (psc-ide-server-start)))
 
   (add-hook 'purescript-mode-hook
-            (lambda ()
-              (define-key purescript-mode-map (kbd "C-c l") 'flycheck-mode)
+	    (lambda ()
+	      (define-key purescript-mode-map (kbd "C-c l") 'flycheck-mode)
 	      (define-key purescript-mode-map (kbd "<f7>") 'flycheck-list-errors)
-              (psc-ide-mode)
-              (company-mode)
-              (flycheck-mode)
-              (turn-on-purescript-indentation)
+	      (psc-ide-mode)
+	      (company-mode)
+	      (flycheck-mode)
+	      (turn-on-purescript-indentation)
 	      (customize-set-variable 'psc-ide-rebuild-on-save t)
 
-	      (advice-add 'psc-ide-rebuild-handler :after
-			  (lambda (x)
-			    (quit-windows-on "*psc-ide-rebuild*")))
-              (haskell-decl-scan-mode)
+	      ;; (advice-add 'psc-ide-rebuild-handler :after
+	      ;; 		  (lambda (x)
+	      ;; 		    (quit-windows-on "*psc-ide-rebuild*")))
+	      (haskell-decl-scan-mode)
 	      (purs-format-on-save-mode)
+
+	      (setq-local comment-start "{-")
+	      (setq-local comment-continue " -")
+	      (setq-local comment-start-skip "/\\*+[ \t]*")
+	      (setq-local comment-end "-}")
+	      (setq-local comment-end-skip "[ \t]*\\*+/")
+	      (setq-local comment-style 'extra-line)
 
 	      (my-psc-ide-server-start)))
   )
