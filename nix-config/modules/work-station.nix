@@ -100,7 +100,7 @@ with lib;
 
   systemd.user.services.xcompmgr = {
     serviceConfig = {
-      ExecStart = "${pkgs.xcompmgr}/bin/xcompmgr -F -f";
+      ExecStart = "${pkgs.xcompmgr}/bin/xcompmgr";
       Restart = "always";
     };
     wantedBy = [ "graphical-session.target" ];
