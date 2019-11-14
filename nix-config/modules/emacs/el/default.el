@@ -620,9 +620,15 @@ with word around mark."
   ;;(add-to-list 'auto-mode-alist '("\\.nix" . nix-mode))
   (add-hook 'nix-mode-hook #'company-mode)
 
-  (add-hook 'nix-mode-hook (lambda ()
-			     (add-hook 'before-save-hook 'nix-format-buffer nil t)
-			     )))
+  (defun nix-format-on-save-on ()
+    (interactive)
+    (add-hook 'before-save-hook 'nix-format-buffer nil t))
+
+  (defun nix-format-on-save-off ()
+    (interactive)
+    (remove-hook 'before-save-hook 'nix-format-buffer t))
+
+  (nix-format-on-save-on))
 
 
 (progn
@@ -658,8 +664,7 @@ with word around mark."
 
   (setq mmm-global-mode 'maybe)
   ;;(mmm-add-mode-ext-class 'nix-mode "\\.nix\\'" 'nix-haskell)
-  (mmm-add-mode-ext-class 'nix-mode "\\.nix\\'" 'nix-clojure)
-  (add-hook 'nix-mode-hook #'mmm-mode))
+  (mmm-add-mode-ext-class 'nix-mode "\\.nix\\'" 'nix-clojure))
 
 
 (progn
