@@ -15,6 +15,7 @@ with lib;
     ./extra-pkgs.nix
     ./dunst
     ./chromium
+    ./keyboard.nix
   ];
 
   networking.networkmanager.enable = true;
@@ -28,13 +29,6 @@ with lib;
   hardware.pulseaudio.enable = true;
 
   services.xserver = {
-    layout = "us";
-    enable = true;
-    exportConfiguration = true;
-    xkbVariant = "altgr-intl";
-    xkbOptions = "ctrl:nocaps, eurosign:e, compose:ralt";
-#    xkbOptions = "eurosign:e,caps:none, keypad:pointerkeys";
-
     displayManager = {
       sessionCommands = ''
         ${pkgs.xorg.xmodmap}/bin/xmodmap /etc/Xmodmap
