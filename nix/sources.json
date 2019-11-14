@@ -53,10 +53,10 @@
         "homepage": "",
         "owner": "thought2",
         "repo": "spago2nix",
-        "rev": "1f3c02feacec0bfa8c4f473856afa0ef777a9926",
-        "sha256": "03wjcw50jw1m2qc69z3pbqwj2rjnbds7620j70b46gqpxj4pd89h",
+        "rev": "34125306e30f1b50f6d8cb5d803f66f3514acf49",
+        "sha256": "0qm2pw8inyzwzn56d7jimcg28zjdk5n7xh5lvfl82jkd79f2j6jp",
         "type": "tarball",
-        "url": "https://github.com/thought2/spago2nix/archive/1f3c02feacec0bfa8c4f473856afa0ef777a9926.tar.gz",
+        "url": "https://github.com/thought2/spago2nix/archive/34125306e30f1b50f6d8cb5d803f66f3514acf49.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
