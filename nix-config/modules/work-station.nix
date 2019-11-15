@@ -3,6 +3,7 @@
 let
   systemPkgs = import ../pkgs/base.nix { inherit pkgs; };
   shorthands = import ../pkgs/shorthands.nix { inherit pkgs; inherit config; };
+  sources = import ../../nix/sources.nix;
 in
 
 with pkgs;
@@ -17,6 +18,18 @@ with lib;
     ./chromium
     ./keyboard.nix
   ];
+
+  nix = {
+    binaryCaches = [
+      "https://nix-tools.cachix.org"
+    ];
+    binaryCachePublicKeys = [
+      "nix-tools.cachix.org-1:ebBEBZLogLxcCvipq2MTvuHlP7ZRdkazFSQsbs0Px1A="
+    ];
+    trustedUsers = [ "root" "mbock"];
+  };
+
+#  nixpkgs.overlays = [ (import sources."haskell.nix").overlays ];
 
   networking.networkmanager.enable = true;
 
