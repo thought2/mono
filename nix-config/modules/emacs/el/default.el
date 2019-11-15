@@ -620,15 +620,24 @@ with word around mark."
   ;;(add-to-list 'auto-mode-alist '("\\.nix" . nix-mode))
   (add-hook 'nix-mode-hook #'company-mode)
 
+  (setq nix-format-on-save t)
+
+  (add-hook 'nix-mode-hook
+	    (lambda ()
+	      (add-hook 'before-save-hook
+			(lambda ()
+			  (when nix-format-on-save
+			    (nix-format-buffer)))
+			nil
+			t)))
+
   (defun nix-format-on-save-on ()
     (interactive)
-    (add-hook 'before-save-hook 'nix-format-buffer nil t))
+    (setq nix-format-on-save t))
 
   (defun nix-format-on-save-off ()
     (interactive)
-    (remove-hook 'before-save-hook 'nix-format-buffer t))
-
-  (nix-format-on-save-on))
+    (setq nix-format-on-save nil)))
 
 
 (progn
