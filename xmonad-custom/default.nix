@@ -1,7 +1,7 @@
-{ mkDerivation, aeson, base, bytestring, hpack, stdenv, xmonad
-, xmonad-contrib
+{ pkgs
 }:
-mkDerivation {
+with pkgs; with stdenv; with haskellPackages;
+pkgs.haskellPackages.mkDerivation {
   pname = "xmonad-custom";
   version = "0.1.0.0";
   src = ./.;

@@ -27,15 +27,7 @@ let
     with stdenv;
     with haskellPackages;
     import ../../xmonad-custom/default.nix  {
-      inherit
-        mkDerivation
-        base
-        hpack
-        stdenv
-        xmonad
-        xmonad-contrib
-        aeson
-        bytestring;
+      inherit pkgs;
     };
 
   configFile = pkgs.writeText "config.json" (builtins.toJSON config);
