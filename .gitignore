@@ -11,3 +11,5 @@ generated-docs/
 .spago2nix/
 tmp/
 result
+.cache/
+dist/
