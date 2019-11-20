@@ -1,7 +1,7 @@
 { name =
     "purescript-scratch"
 , dependencies =
-    [ "effect", "console", "psci-support" ]
+    [ "console", "effect", "hot-reload", "psci-support" ]
 , packages =
     ./../packages.dhall
 , sources =
