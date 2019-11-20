@@ -71,6 +71,16 @@ let additions =
           , version =
               "v1.0.0"
           }
+      , hot-reload = ./purescript-hot-reload/spago.dhall as Location
+      , data-default =
+           { dependencies =
+              [ "maybe", "record", "lists"
+              ]
+          , repo =
+              "https://github.com/thought2/purescript-data-default.git"
+          , version =
+              "v0.3.2"
+          }
       }
 
 in  upstream ⫽ overrides ⫽ additions
