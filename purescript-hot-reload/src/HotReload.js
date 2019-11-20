@@ -10,7 +10,7 @@ if (!globalObj.__appState) {
   globalObj.__appState = {};
 }
 
-exports.write = function(id) {
+exports.writeCell = function(id) {
   return function(x) {
     return function() {
       globalObj.__appState[id] = x;
@@ -18,7 +18,7 @@ exports.write = function(id) {
   };
 };
 
-exports._read = function(id) {
+exports._readCell = function(id) {
   return function() {
     return globalObj.__appState[id];
   };

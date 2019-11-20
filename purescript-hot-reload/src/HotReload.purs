@@ -1,14 +1,14 @@
-module HotReload (init, saveSnapshot, defaultInitConfig, InitConfig, module HotReload.IdRef) where
+module HotReload (init, saveSnapshot, defaultInitConfig, InitConfig, Id(Id)) where
 
 import Prelude
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson)
 import Data.Array as Array
 import Data.Either as Either
 import Data.Maybe (Maybe(..), maybe)
+import Data.Nullable (Nullable)
+import Data.Nullable as Nullable
+import Effect (Effect)
 import Effect.Console as Console
-import Effect.Unsafe (unsafePerformEffect)
-import HotReload.IdRef (Id(Id))
-import HotReload.IdRef as IdRef
 
 newtype MigrateFn
   = MigrateFn (Array Json -> Json -> Json)
@@ -37,44 +37,62 @@ init ::
   forall a.
   EncodeJson a =>
   DecodeJson a =>
-  Id -> InitConfig -> a -> a
-init id { cache, migrateFn } initState =
-  unsafePerformEffect
-    $ do
-        res :: Maybe Cell <- IdRef.read id
-        case res of
-          Nothing -> do
-            IdRef.write id
-              { history: []
-              , snapshot: \_ -> encodeJson initState
-              }
-            pure initState
-          Just { history, snapshot } -> do
-            let
-              newHistory = Array.snoc history (snapshot unit)
-            _ <- IdRef.modify (_ { history = newHistory }) id
-            let
-              newSnapshot =
-                migrateFn
-                  { previous: newHistory
-                  , current: encodeJson initState
-                  }
+  Id -> InitConfig -> a -> Effect a
+init id { cache, migrateFn } initState = do
+  res <- readCell id
+  case res of
+    Nothing -> do
+      writeCell id
+        { history: []
+        , snapshot: \_ -> encodeJson initState
+        }
+      pure initState
+    Just { history, snapshot } -> do
+      let
+        newHistory = Array.snoc history (snapshot unit)
+      _ <- modifyCell (_ { history = newHistory }) id
+      let
+        newSnapshot =
+          migrateFn
+            { previous: newHistory
+            , current: encodeJson initState
+            }
 
-              newX :: Maybe a
-              newX = Either.hush $ decodeJson newSnapshot
-            case newX of
-              Nothing -> do
-                _ <- IdRef.modify (_ { snapshot = \_ -> encodeJson initState }) id
-                Console.log "State transition failed"
-                pure initState
-              Just x -> do
-                _ <- IdRef.modify (_ { snapshot = \_ -> encodeJson x }) id
-                pure x
+        newX :: Maybe a
+        newX = Either.hush $ decodeJson newSnapshot
+      case newX of
+        Nothing -> do
+          _ <- modifyCell (_ { snapshot = \_ -> encodeJson initState }) id
+          Console.log "State transition failed"
+          pure initState
+        Just x -> do
+          _ <- modifyCell (_ { snapshot = \_ -> encodeJson x }) id
+          pure x
 
 -- SAVE SNAPSHOT
-saveSnapshot :: forall a. EncodeJson a => Id -> a -> a
-saveSnapshot id x =
-  unsafePerformEffect
-    $ do
-        _ <- IdRef.modify (_ { snapshot = \_ -> encodeJson x }) id
-        pure x
+saveSnapshot :: forall a. EncodeJson a => Id -> a -> Effect a
+saveSnapshot id x = do
+  _ <- modifyCell (_ { snapshot = \_ -> encodeJson x }) id
+  pure x
+
+-- ID REF
+newtype Id
+  = Id String
+
+foreign import writeCell :: Id -> Cell -> Effect Unit
+
+foreign import _readCell :: Id -> Effect (Nullable Cell)
+
+readCell :: Id -> Effect (Maybe Cell)
+readCell x = map Nullable.toMaybe $ _readCell x
+
+modifyCell :: (Cell -> Cell) -> Id -> Effect (Maybe Cell)
+modifyCell f id = do
+  maybeVal <- readCell id
+  case maybeVal of
+    Nothing -> pure Nothing
+    Just val -> do
+      let
+        newVal = f val
+      _ <- writeCell id newVal
+      pure $ Just newVal
