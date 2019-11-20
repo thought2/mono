@@ -11,12 +11,15 @@ import HotReload as HotReload
 type State
   = Int
 
+id :: HotReload.Id
+id = HotReload.Id "appState"
+
 initState :: State
-initState = 0
+initState = HotReload.init id HotReload.defaultInitConfig 0
 
 main :: Effect Unit
 main = do
-  state <- HotReload.init def initState
-  Console.logShow state
-  _ <- HotReload.saveSnapshot def (state + 1)
-  log "AAAAA"
+  Console.logShow initState
+  let
+    state2 = HotReload.saveSnapshot id (initState + 1)
+  log "AAAAAAAA"
