@@ -1,4 +1,12 @@
-module HotReload (init, saveSnapshot, defaultInitConfig, InitConfig, Id(Id)) where
+module HotReload
+  ( init
+  , snapshot
+  , unsafeInit
+  , unsafeSnapshot
+  , defaultInitConfig
+  , InitConfig
+  , Id(Id)
+  ) where
 
 import Prelude
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson)
@@ -9,9 +17,7 @@ import Data.Nullable (Nullable)
 import Data.Nullable as Nullable
 import Effect (Effect)
 import Effect.Console as Console
-
-newtype MigrateFn
-  = MigrateFn (Array Json -> Json -> Json)
+import Effect.Unsafe (unsafePerformEffect)
 
 -- HOT RELOAD
 type InitConfig
@@ -39,6 +45,7 @@ init ::
   DecodeJson a =>
   Id -> InitConfig -> a -> Effect a
 init id { cache, migrateFn } initState = do
+  Console.log "init"
   res <- readCell id
   case res of
     Nothing -> do
@@ -70,8 +77,9 @@ init id { cache, migrateFn } initState = do
           pure x
 
 -- SAVE SNAPSHOT
-saveSnapshot :: forall a. EncodeJson a => Id -> a -> Effect a
-saveSnapshot id x = do
+snapshot :: forall a. EncodeJson a => DecodeJson a => Id -> a -> Effect a
+snapshot id x = do
+  Console.log $ "snap" <> show ((\(Id i) -> i) id)
   _ <- modifyCell (_ { snapshot = \_ -> encodeJson x }) id
   pure x
 
@@ -96,3 +104,14 @@ modifyCell f id = do
         newVal = f val
       _ <- writeCell id newVal
       pure $ Just newVal
+
+-- UNSAFE
+unsafeInit ::
+  forall a.
+  EncodeJson a =>
+  DecodeJson a =>
+  Id -> InitConfig -> a -> a
+unsafeInit x1 x2 x3 = unsafePerformEffect $ init x1 x2 x3
+
+unsafeSnapshot :: forall a. EncodeJson a => DecodeJson a => Id -> a -> a
+unsafeSnapshot x1 x2 = unsafePerformEffect $ snapshot x1 x2

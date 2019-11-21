@@ -81,6 +81,7 @@ let additions =
           , version =
               "v0.3.2"
           }
+      , halogen-hot-reload = ./purescript-halogen-hot-reload/spago.dhall as Location
       }
 
 in  upstream ⫽ overrides ⫽ additions

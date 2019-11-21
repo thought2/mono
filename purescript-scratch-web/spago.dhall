@@ -1,7 +1,13 @@
 { name =
     "purescript-scratch"
 , dependencies =
-    [ "console", "effect", "hot-reload", "psci-support" ]
+    [ "argonaut"
+    , "console"
+    , "effect"
+    , "halogen"
+    , "halogen-hot-reload"
+    , "psci-support"
+    ]
 , packages =
     ./../packages.dhall
 , sources =

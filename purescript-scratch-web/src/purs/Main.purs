@@ -1,24 +1,18 @@
 module Main where
 
 import Prelude
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Effect.Console (log)
-import Effect.Console as Console
-import Effect.Unsafe (unsafePerformEffect)
-import HotReload as HotReload
-
-type State
-  = Int
-
-id :: HotReload.Id
-id = HotReload.Id "appState"
-
-initState :: State
-initState = unsafePerformEffect $ HotReload.init id HotReload.defaultInitConfig 0
+import Halogen.Aff as HA
+import Halogen.VDom.Driver (runUI)
+import Partial.Unsafe (unsafeCrashWith)
+import Ui.Button as Button
+import Web.DOM.ParentNode (QuerySelector(..))
 
 main :: Effect Unit
-main = do
-  Console.logShow initState
-  let
-    state2 = unsafePerformEffect $ HotReload.saveSnapshot id (initState + 1)
-  log "AA"
+main =
+  HA.runHalogenAff do
+    maybeApp <- HA.selectElement (QuerySelector "#app")
+    case maybeApp of
+      Just app -> runUI Button.component unit app
+      Nothing -> unsafeCrashWith ""
