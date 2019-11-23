@@ -1,4 +1,4 @@
-{ sources ? import ../../nix/sources.nix, config, ... }:
+{ sources ? import ../../nix/sources.nix, config ? { }, ... }:
 self: super:
 let
   node2nixPkgs = import ../pkgs/node2nix { };
