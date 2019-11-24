@@ -1,5 +1,5 @@
 { pkgs, nodejs, python, alsaLib, runCommand, node2nix, stdenv, spago2nix
-, writeShellScriptBin, writeText, purescript, parcel-bundler, ... }:
+, writeShellScriptBin, writeText, purescript, ... }:
 
 let
 
@@ -12,7 +12,6 @@ let
       mkdir $out
       cp ${./package.json} $out/package.json
       cp ${./package-lock.json} $out/package-lock.json
-
       cd $out
       ${node2nix}/bin/node2nix --lock
     '';
@@ -39,13 +38,13 @@ let
       Main.main()
     '';
   in writeShellScriptBin "fad9-cli" ''
-    export NODE_PATH=${nodePkg}/lib/node_modules/fad9-cli/node_modules
+    export NODE_PATH=`echo ${nodePkg}/lib/node_modules/*/node_modules`
     ${nodejs}/bin/node ${entry} $@
   '';
 
   default = stdenv.mkDerivation {
     name = "fad9-cli";
-    buildInputs = [ python alsaLib nodejs nix-gen parcel-bundler ];
+    buildInputs = [ python alsaLib nodejs nix-gen ];
     buildCommand = "ln -s ${executable} $out";
   };
 
