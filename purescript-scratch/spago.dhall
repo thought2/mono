@@ -1,7 +1,14 @@
 { name =
     "purescript-scratch"
 , dependencies =
-    [ "effect", "console", "psci-support", "profunctor-lenses", "typelevel" ]
+    [ "console"
+    , "effect"
+    , "profunctor-lenses"
+    , "psci-support"
+    , "record"
+    , "typelevel"
+    , "unsafe-coerce"
+    ]
 , packages =
     ./../packages.dhall
 , sources =
