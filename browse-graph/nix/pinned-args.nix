@@ -8,6 +8,7 @@ in {
   inherit (nixpkgs) stdenv nix writeShellScriptBin runCommand writeText;
   pkgs = nixpkgs;
   parcel-bundler = nixpkgs.nodePackages.parcel-bundler;
+  typescript = nixpkgs.nodePackages.typescript;
   inherit (easy-purescript-nix) spago purescript;
   inherit spago2nix;
   inherit niv;
