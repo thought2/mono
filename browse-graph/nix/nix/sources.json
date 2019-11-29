@@ -11,28 +11,16 @@
         "url": "https://github.com/justinwoo/easy-purescript-nix/archive/927403abd55dfc82824019cc03efbc28047b3d46.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
-    "monorepo-tools": {
-        "branch": "master",
-        "description": "[READ-ONLY] Tools for building and splitting monolithic repository from existing packages (with their history unchanged)",
-        "homepage": "",
-        "owner": "shopsys",
-        "repo": "monorepo-tools",
-        "rev": "5083dec5d8316dba45163e566c240f4a2ecd901a",
-        "sha256": "1ic62zswm2f5lj3km1mb1yhis1hiz2mh7swiy0y8z3l9gnq32vd7",
-        "type": "tarball",
-        "url": "https://github.com/shopsys/monorepo-tools/archive/5083dec5d8316dba45163e566c240f4a2ecd901a.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
     "niv": {
         "branch": "master",
         "description": "Easy dependency management for Nix projects",
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
         "repo": "niv",
-        "rev": "6da5c19aa220dfd840031e0cdbe83bf8f807fd50",
-        "sha256": "173gkldf4in77ksm8bgf7bhkfyc4ayddka4cgxv5361kpgyvgccw",
+        "rev": "f4ff956e9b188a0b44efb539ff5f470a8e9cdf97",
+        "sha256": "1aa4rrffcb0awnyz42jvak4d6cbbknaxzijvpmchhvyra0hbsn6f",
         "type": "tarball",
-        "url": "https://github.com/nmattia/niv/archive/6da5c19aa220dfd840031e0cdbe83bf8f807fd50.tar.gz",
+        "url": "https://github.com/nmattia/niv/archive/f4ff956e9b188a0b44efb539ff5f470a8e9cdf97.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
@@ -41,10 +29,10 @@
         "homepage": "https://github.com/NixOS/nixpkgs",
         "owner": "NixOS",
         "repo": "nixpkgs-channels",
-        "rev": "ef8c34c4721761af0a9258129cad55be5bd9c696",
-        "sha256": "1d90yrhc3i0d940rc0zkm7c1rx3v7nn9rzpbzxm11vqaa3v8y37x",
+        "rev": "6e966de055edb820e455cffc7e07bf66aa3dda78",
+        "sha256": "1al06125rqip36p3jb72s23abz58qy7dc9bj611sigp9qy6x4g61",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs-channels/archive/ef8c34c4721761af0a9258129cad55be5bd9c696.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/6e966de055edb820e455cffc7e07bf66aa3dda78.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "spago2nix": {

@@ -1,0 +1,12 @@
+{
+  "manifest_version": 2,
+  "name": "browse-graph",
+  "version": "1.0",
+  "content_scripts": [
+    {
+      "matches": ["*://*.mozilla.org/*"],
+      "js": ["index.js"]
+    }
+  ]
+
+}
