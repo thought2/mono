@@ -71,6 +71,14 @@ let additions =
           , version =
               "v1.0.0"
           }
+      , colehaus-graphs =
+          { dependencies =
+              [ "ordered-collections", "catenable-lists" ]
+          , repo =
+              "https://github.com/colehaus/purescript-graphs.git"
+          , version =
+              "v7.0.0"
+          }
       }
 
 in  upstream ⫽ overrides ⫽ additions

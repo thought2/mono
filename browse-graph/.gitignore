@@ -10,3 +10,5 @@
 /.spago
 /.cache
 /dist
+/src/**/*.js
+/src/**/*.js.map
