@@ -1,18 +1,20 @@
 module Dagre (layout) where
 
-import Data.Typelevel.Num (D2)
-import Data.Vec (Vec)
 import GraphLib as GraphLib
 import Partial.Unsafe (unsafeCrashWith)
 
-type NodeLabel_ r
-  = { x :: Number, y :: Number | r }
+type NodeLabel_ a
+  = { x :: Number, y :: Number, data_ :: a }
 
-type GraphLabel_ r
-  = { width :: Number, height :: Number | r }
+type GraphLabel_ a
+  = { width :: Number, height :: Number, data_ :: a }
 
-type EdgeLabel_ r
-  = { | r }
+type EdgeLabel_ a
+  = { x :: Number
+    , y :: Number
+    , points :: Array { x :: Number, y :: Number }
+    , data_ :: a
+    }
 
 type GraphSpec_ g e n
   = GraphLib.GraphSpec_
@@ -23,13 +25,15 @@ type GraphSpec_ g e n
 foreign import layout_ :: forall g e n. GraphSpec g e n -> GraphSpec g e n
 
 type GraphFormat
-  = { size :: Vec D2 Number }
+  = { size :: { x :: Number, y :: Number } }
 
 type EdgeFormat
-  = {}
+  = { pos :: { x :: Number, y :: Number }
+    , points :: Array { x :: Number, y :: Number }
+    }
 
 type NodeFormat
-  = { pos :: Vec D2 Number }
+  = { pos :: { x :: Number, y :: Number } }
 
 type GraphSpec g e n
   = GraphLib.GraphSpec_
@@ -38,4 +42,4 @@ type GraphSpec g e n
       ({ format :: NodeFormat, data_ :: n })
 
 layout :: forall g e n. GraphSpec g e n -> GraphSpec g e n
-layout = unsafeCrashWith "layout"
+layout graphSpec = unsafeCrashWith ""
