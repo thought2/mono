@@ -10,6 +10,7 @@ You can edit this file as you like.
     , "console"
     , "effect"
     , "psci-support"
+    , "sized-vectors"
     , "web-html"
     , "web-storage"
     ]

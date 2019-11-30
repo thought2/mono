@@ -1,0 +1,9 @@
+{
+  "name": "browse-graph",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "dagre": "^0.8.4"
+  }
+}
