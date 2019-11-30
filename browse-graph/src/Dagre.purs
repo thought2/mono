@@ -1,45 +1,75 @@
-module Dagre (layout) where
+module Dagre (layoutBySpec, GraphSpec) where
 
-import GraphLib as GraphLib
+import Prelude
+import GraphLib.Bindings as GraphLib.Bindings
+import Dagre.Bindings as Dagre.Bindings
 import Partial.Unsafe (unsafeCrashWith)
+import GraphSpec as GraphSpec
 
-type NodeLabel_ a
-  = { x :: Number, y :: Number, data_ :: a }
+type Vec
+  = { x :: Number, y :: Number }
 
-type GraphLabel_ a
-  = { width :: Number, height :: Number, data_ :: a }
-
-type EdgeLabel_ a
-  = { x :: Number
-    , y :: Number
-    , points :: Array { x :: Number, y :: Number }
+type GraphLabel a
+  = { format :: { size :: Vec }
     , data_ :: a
     }
 
-type GraphSpec_ g e n
-  = GraphLib.GraphSpec_
-      (GraphLabel_ g)
-      (EdgeLabel_ e)
-      (NodeLabel_ n)
-
-foreign import layout_ :: forall g e n. GraphSpec g e n -> GraphSpec g e n
-
-type GraphFormat
-  = { size :: { x :: Number, y :: Number } }
-
-type EdgeFormat
-  = { pos :: { x :: Number, y :: Number }
-    , points :: Array { x :: Number, y :: Number }
+type EdgeLabel a
+  = { format :: { pos :: Vec, points :: Array Vec }
+    , data_ :: a
     }
 
-type NodeFormat
-  = { pos :: { x :: Number, y :: Number } }
+type NodeLabel a
+  = { format :: { pos :: Vec }
+    , data_ :: a
+    }
 
 type GraphSpec g e n
-  = GraphLib.GraphSpec_
-      ({ format :: GraphFormat, data_ :: g })
-      ({ format :: EdgeFormat, data_ :: e })
-      ({ format :: NodeFormat, data_ :: n })
+  = GraphLib.Bindings.GraphSpec
+      (GraphLabel g)
+      (EdgeLabel e)
+      (NodeLabel n)
 
-layout :: forall g e n. GraphSpec g e n -> GraphSpec g e n
-layout graphSpec = unsafeCrashWith ""
+specToBindings :: forall g e n. GraphSpec g e n -> Dagre.Bindings.GraphSpec g e n
+specToBindings graphSpec =
+  graphSpec
+    # GraphSpec.mapGraph
+        ( \{ format: { size: { x, y } }, data_ } ->
+            { width: x, height: y, data_ }
+        )
+    # GraphSpec.mapEdges
+        ( \{ format: { pos, points }, data_ } ->
+            { x: pos.x, y: pos.y, points, data_ }
+        )
+    # GraphSpec.mapNodes
+        ( \{ format: { pos }, data_ } ->
+            { x: pos.x, y: pos.y, data_ }
+        )
+
+specFromBindings :: forall g e n. Dagre.Bindings.GraphSpec g e n -> GraphSpec g e n
+specFromBindings graphSpec =
+  graphSpec
+    # GraphSpec.mapGraph
+        ( \{ width, height, data_ } ->
+            { format: { size: { x: width, y: height } }
+            , data_
+            }
+        )
+    # GraphSpec.mapEdges
+        ( \{ x, y, points, data_ } ->
+            { format: { pos: { x, y }, points }
+            , data_
+            }
+        )
+    # GraphSpec.mapNodes
+        ( \{ x, y, data_ } ->
+            { format: { pos: { x, y } }
+            , data_
+            }
+        )
+
+layoutBySpec :: forall g e n. GraphSpec g e n -> GraphSpec g e n
+layoutBySpec graphSpec =
+  specToBindings graphSpec
+    # Dagre.Bindings.layoutBySpec
+    # specFromBindings

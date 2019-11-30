@@ -1,20 +1,18 @@
 import * as graphlib from "graphlib";
+import * as GraphSpec from "../GraphSpec";
 
 type Id = string;
 
-export interface GraphSpec<G, E, N> {
-  graph: { label: G };
-  nodes: Array<{ id: Id; label: N }>;
-  edges: Array<{
-    fromId: Id;
-    toId: Id;
-    label: E;
-  }>;
-}
+export type GraphSpec<Graph, Edge, Node> = GraphSpec.GraphSpec<
+  Id,
+  Graph,
+  Edge,
+  Node
+>;
 
 export const specToGraph = <G, E, N>(
   graphSpec: GraphSpec<G, E, N>
-): graphlib.Graph<G, E, N> => {
+) => (): graphlib.Graph<G, E, N> => {
   const graph: graphlib.Graph<G, E, N> = new graphlib.Graph();
 
   graph.setGraph(graphSpec.graph.label);
@@ -28,9 +26,9 @@ export const specToGraph = <G, E, N>(
   return graph;
 };
 
-export const graph2spec = <G, E, N>(
+export const graphToSpec = <G, E, N>(
   graph: graphlib.Graph<G, E, N>
-): GraphSpec<G, E, N> | null => {
+) => (): GraphSpec<G, E, N> | null => {
   const graphLabel = graph.graph();
   if (!graphLabel) return null;
 
