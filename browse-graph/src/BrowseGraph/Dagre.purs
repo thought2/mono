@@ -1,4 +1,4 @@
-module Dagre
+module BrowseGraph.Dagre
   ( layoutBySpec
   , GraphSpec
   , GraphLabel
@@ -8,10 +8,10 @@ module Dagre
   ) where
 
 import Prelude
-import GraphLib.Bindings as GraphLib.Bindings
-import Dagre.Bindings as Dagre.Bindings
+import BrowseGraph.GraphLib.Bindings as GraphLib.Bindings
+import BrowseGraph.Dagre.Bindings as Dagre.Bindings
 import Partial.Unsafe (unsafeCrashWith)
-import GraphSpec as GraphSpec
+import BrowseGraph.GraphSpec as BrowseGraph.GraphSpec
 
 type Vec
   = { x :: Number, y :: Number }
@@ -40,15 +40,15 @@ type GraphSpec g e n
 specToBindings :: forall g e n. GraphSpec g e n -> Dagre.Bindings.GraphSpec g e n
 specToBindings graphSpec =
   graphSpec
-    # GraphSpec.mapGraph
+    # BrowseGraph.GraphSpec.mapGraph
         ( \{ format: { size: { x, y } }, data_ } ->
             { width: x, height: y, data_ }
         )
-    # GraphSpec.mapEdges
+    # BrowseGraph.GraphSpec.mapEdges
         ( \{ format: { pos, points }, data_ } ->
             { x: pos.x, y: pos.y, points, data_ }
         )
-    # GraphSpec.mapNodes
+    # BrowseGraph.GraphSpec.mapNodes
         ( \{ format: { pos }, data_ } ->
             { x: pos.x, y: pos.y, data_ }
         )
@@ -56,19 +56,19 @@ specToBindings graphSpec =
 specFromBindings :: forall g e n. Dagre.Bindings.GraphSpec g e n -> GraphSpec g e n
 specFromBindings graphSpec =
   graphSpec
-    # GraphSpec.mapGraph
+    # BrowseGraph.GraphSpec.mapGraph
         ( \{ width, height, data_ } ->
             { format: { size: { x: width, y: height } }
             , data_
             }
         )
-    # GraphSpec.mapEdges
+    # BrowseGraph.GraphSpec.mapEdges
         ( \{ x, y, points, data_ } ->
             { format: { pos: { x, y }, points }
             , data_
             }
         )
-    # GraphSpec.mapNodes
+    # BrowseGraph.GraphSpec.mapNodes
         ( \{ x, y, data_ } ->
             { format: { pos: { x, y } }
             , data_

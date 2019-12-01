@@ -1,4 +1,4 @@
-module GraphSpec where
+module BrowseGraph.GraphSpec where
 
 import Prelude
 

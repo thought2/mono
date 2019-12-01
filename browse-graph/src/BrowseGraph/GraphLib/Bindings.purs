@@ -1,7 +1,7 @@
-module GraphLib.Bindings where
+module BrowseGraph.GraphLib.Bindings where
 
 import Effect (Effect)
-import GraphSpec as GraphSpec
+import BrowseGraph.GraphSpec as GraphSpec
 
 foreign import data Graph :: Type -> Type -> Type -> Type
 

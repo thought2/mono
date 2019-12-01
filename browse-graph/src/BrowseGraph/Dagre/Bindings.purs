@@ -1,6 +1,6 @@
-module Dagre.Bindings where
+module BrowseGraph.Dagre.Bindings where
 
-import GraphSpec as GraphSpec
+import BrowseGraph.GraphSpec as BrowseGraph.GraphSpec
 import Partial.Unsafe (unsafeCrashWith)
 
 type NodeLabel_ a
@@ -17,7 +17,7 @@ type EdgeLabel_ a
     }
 
 type GraphSpec g e n
-  = GraphSpec.GraphSpec
+  = BrowseGraph.GraphSpec.GraphSpec
       String
       (GraphLabel_ g)
       (EdgeLabel_ e)

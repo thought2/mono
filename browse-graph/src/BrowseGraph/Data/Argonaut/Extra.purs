@@ -1,4 +1,4 @@
-module Data.Argonaut.Extra where
+module BrowseGraph.Data.Argonaut.Extra where
 
 import Prelude
 import Data.Argonaut (class DecodeJson, class EncodeJson)

@@ -1,4 +1,4 @@
-module Web.Storage.Storage.Extra where
+module BrowseGraph.Web.Storage.Storage.Extra where
 
 import Prelude
 import Data.Maybe (Maybe, maybe)
