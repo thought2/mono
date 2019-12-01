@@ -1,4 +1,11 @@
-module Dagre (layoutBySpec, GraphSpec) where
+module Dagre
+  ( layoutBySpec
+  , GraphSpec
+  , GraphLabel
+  , EdgeLabel
+  , NodeLabel
+  , Vec
+  ) where
 
 import Prelude
 import GraphLib.Bindings as GraphLib.Bindings
