@@ -1,5 +1,5 @@
 import * as graphlib from "graphlib";
-import * as GraphSpec from "../GraphSpec";
+import * as GraphSpec from "../../../ts/GraphSpec";
 
 type Id = string;
 

@@ -1,11 +1,15 @@
 { stdenv, spago, purescript, niv, nix, writeShellScriptBin, spago2nix
 , runCommand, pkgs, parcel-bundler, writeText, typescript, yarn, yarn2nix }:
 let
+  tsc-wrapped = writeShellScriptBin "tsc-wrapped" ''
+    ${typescript}/bin/tsc $@
+    find src -type f -name '*.js' | xargs sed -i 's/exports.__esModule = true;//g'
+  '';
+
   generateNix = writeShellScriptBin "generate-nix" ''
     ${spago2nix}/bin/spago2nix generate
     mkdir -p nix/spago2nix
     mv spago-packages.nix nix/spago2nix
-
   '';
 
   buildYarn = yarn2nix.mkYarnModules {
@@ -26,8 +30,7 @@ let
       cp -r ${../src} $TMP/src
       chmod -R +w $TMP/src
       cd $TMP
-      ${typescript}/bin/tsc
-      find src -type f -name '*.js' | xargs sed -i 's/exports.__esModule = true;//g'
+      ${tsc-wrapped}/bin/tsc-wrapped
       cp -r $TMP/src $out
     '';
     projectOutput = spagoPkgs.mkBuildProjectOutput {
@@ -62,6 +65,7 @@ in stdenv.mkDerivation {
     typescript
     yarn
     yarn2nix.yarn2nix
+    tsc-wrapped
   ];
   buildCommand = ''
     mkdir $out

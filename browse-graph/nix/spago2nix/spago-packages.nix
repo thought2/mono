@@ -593,18 +593,6 @@ let
         installPhase = "ln -s $src $out";
       };
 
-    "sized-vectors" = pkgs.stdenv.mkDerivation {
-        name = "sized-vectors";
-        version = "v3.1.0";
-        src = pkgs.fetchgit {
-          url = "https://github.com/bodil/purescript-sized-vectors.git";
-          rev = "ddb8c8e21a2c37e611a9d031ffbb68b261380851";
-          sha256 = "1dldwalx2smij4mhhh63qf45ylj1sji029ayppinc3py035shblw";
-        };
-        phases = "installPhase";
-        installPhase = "ln -s $src $out";
-      };
-
     "st" = pkgs.stdenv.mkDerivation {
         name = "st";
         version = "v4.0.0";
@@ -672,18 +660,6 @@ let
           url = "https://github.com/purescript/purescript-type-equality.git";
           rev = "2cdae51c394401cd5fc04b03c341273b41532b7d";
           sha256 = "1b7szyca5s96gaawvgwrw7fa8r7gqsdff7xhz3vvngnylv2scl3w";
-        };
-        phases = "installPhase";
-        installPhase = "ln -s $src $out";
-      };
-
-    "typelevel" = pkgs.stdenv.mkDerivation {
-        name = "typelevel";
-        version = "v6.0.0";
-        src = pkgs.fetchgit {
-          url = "https://github.com/bodil/purescript-typelevel.git";
-          rev = "c7917aa6d43440608e6e04332e4c916a45976313";
-          sha256 = "0gxj926ppx6d8inir589x0a30iv29hqc2y6vsa1n1c2vlcqv2zgd";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";

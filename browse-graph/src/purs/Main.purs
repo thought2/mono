@@ -65,12 +65,12 @@ run = do
   previousUrl <- lift $ Web.HTML.HTMLDocument.referrer document
   newGraph <-
     Graph.insertVertex currentUrl { url: currentUrl } graph
-      # ( \graph ->
+      # ( \graph' ->
             if previousUrl /= "" then
-              Graph.insertEdge previousUrl currentUrl graph
+              Graph.insertEdge previousUrl currentUrl graph'
                 # Either.note "Consistency Error"
             else
-              pure graph
+              pure graph'
         )
       # except
   storage.set $ newGraph

@@ -1,7 +1,6 @@
 module BrowseGraph.Dagre.Bindings where
 
 import BrowseGraph.GraphSpec as BrowseGraph.GraphSpec
-import Partial.Unsafe (unsafeCrashWith)
 
 type NodeLabel_ a
   = { x :: Number, y :: Number, data_ :: a }

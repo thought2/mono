@@ -10,7 +10,6 @@ module BrowseGraph.Dagre
 import Prelude
 import BrowseGraph.GraphLib.Bindings as GraphLib.Bindings
 import BrowseGraph.Dagre.Bindings as Dagre.Bindings
-import Partial.Unsafe (unsafeCrashWith)
 import BrowseGraph.GraphSpec as BrowseGraph.GraphSpec
 
 type Vec
