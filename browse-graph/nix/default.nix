@@ -27,6 +27,7 @@ let
       chmod -R +w $TMP/src
       cd $TMP
       ${typescript}/bin/tsc
+      find src -type f -name '*.js' | xargs sed -i 's/exports.__esModule = true;//g'
       cp -r $TMP/src $out
     '';
     projectOutput = spagoPkgs.mkBuildProjectOutput {
