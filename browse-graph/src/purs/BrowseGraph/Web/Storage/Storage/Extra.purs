@@ -7,7 +7,6 @@ import Control.Monad.Except as ExceptT
 import Data.Argonaut as Data.Argonaut
 import Data.Either as Either
 import Effect (Effect)
-import Partial.Unsafe (unsafeCrashWith)
 import Web.Storage.Storage as Web.Storage.Storage
 
 getItem ::
