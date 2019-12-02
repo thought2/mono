@@ -35,14 +35,15 @@ export const graphToSpec = <G, E, N>(
   const nodes = [];
   for (const nodeId of graph.nodes()) {
     const nodeLabel = graph.node(nodeId);
-    if (!nodeLabel) throw new Error("Invalid Graph");
+    if (!nodeLabel)
+      throw new Error(`Invalid Graph: Node Id ${nodeId} does not exist.`);
     nodes.push({ id: nodeId, label: nodeLabel });
   }
 
   const edges = [];
   for (const edgeObj of graph.edges()) {
     const edgeLabel = graph.edge(edgeObj.v, edgeObj.w);
-    if (!edgeLabel) throw new Error("Invalid Graph");
+    if (!edgeLabel) throw new Error("Invalid Graph 2");
     edges.push({ fromId: edgeObj.v, toId: edgeObj.w, label: edgeLabel });
   }
 

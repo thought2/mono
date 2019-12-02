@@ -48,6 +48,7 @@ let
     TMP=`mktemp -d`
     ln -s ${entry} $TMP/index.js
     ln -s ${buildPureScript.projectOutput}/output $TMP/output
+    ln -s ${buildYarn}/node_modules $TMP/node_modules
     mkdir $out
     ${parcel-bundler}/bin/parcel \
       build \

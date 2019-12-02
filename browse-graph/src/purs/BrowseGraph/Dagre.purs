@@ -77,5 +77,6 @@ specFromBindings graphSpec =
 layoutBySpec :: forall g e n. GraphSpec g e n -> GraphSpec g e n
 layoutBySpec graphSpec =
   specToBindings graphSpec
-    # Dagre.Bindings.layoutBySpec
+    -- # Dagre.Bindings.layoutBySpec
+    
     # specFromBindings

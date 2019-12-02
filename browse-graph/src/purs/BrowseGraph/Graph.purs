@@ -10,9 +10,17 @@ module BrowseGraph.Graph
 import Prelude
 import BrowseGraph.GraphSpec as BrowseGraph.GraphSpec
 import Data.Array as Array
+import Data.Map (Map)
 
 newtype Graph id graph edge node
   = Graph (BrowseGraph.GraphSpec.GraphSpec id graph edge node)
+
+newtype Graph' id graph edge node
+  = Graph'
+  { graph :: { label :: graph }
+  , nodes :: Map { id :: id } { label :: node }
+  , edges :: Map { fromId :: id, toId :: id } { label :: edge }
+  }
 
 fromSpec :: forall i g e n. BrowseGraph.GraphSpec.GraphSpec i g e n -> Graph i g e n
 fromSpec graphSpec = Graph graphSpec
