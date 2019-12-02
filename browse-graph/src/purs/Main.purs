@@ -1,6 +1,8 @@
 module Main where
 
 import Prelude
+import BrowseGraph.Graph as BrowseGraph.Graph
+import BrowseGraph.Web.Storage.Storage.Extra as BrowseGraph.Web.Storage.Storage.Extra
 import Control.Alt ((<|>))
 import Control.Monad.Except (ExceptT(..), except)
 import Control.Monad.Except as ExceptT
@@ -16,15 +18,31 @@ import Web.HTML.Location as Web.HTML.Location
 import Web.HTML.Window as Web.HTML.Window
 import Web.Storage.Storage as Web.Storage.Storage
 
-type Graph
+type Graph'
   = Graph.Graph String { url :: String }
 
 foreign import io :: Effect Unit
 
+type Vec
+  = { x :: Number, y :: Number }
+
+type Graph
+  = BrowseGraph.Graph.Graph
+      String
+      { format :: { size :: Vec }
+      , data_ :: Unit
+      }
+      { format :: { pos :: Vec, points :: Array Vec }
+      , data_ :: Unit
+      }
+      { format :: { pos :: Vec }
+      , data_ :: Unit
+      }
+
 storageOperations ::
   Web.Storage.Storage.Storage ->
-  { get :: ExceptT String Effect Graph
-  , set :: Graph -> ExceptT String Effect Unit
+  { get :: ExceptT String Effect Graph'
+  , set :: Graph' -> ExceptT String Effect Unit
   }
 storageOperations storage =
   let
@@ -55,6 +73,58 @@ storageOperations storage =
 
 run :: ExceptT String Effect Unit
 run = do
+  window <- lift $ Web.HTML.window
+  document <- lift $ Web.HTML.Window.document window
+  sessionStorage <- lift $ Web.HTML.Window.sessionStorage window
+  let
+    key = "key"
+  currentUrl <- lift $ Web.HTML.Window.location window >>= Web.HTML.Location.href
+  previousUrl <- lift $ Web.HTML.HTMLDocument.referrer document
+  graph :: Graph <-
+    ( ( BrowseGraph.Web.Storage.Storage.Extra.getItem key sessionStorage
+          <#> BrowseGraph.Graph.fromSpec
+      )
+        <|> ( pure
+              $ BrowseGraph.Graph.init
+                  { format: { size: { x: 0.0, y: 0.0 } }
+                  , data_: unit
+                  }
+          )
+    )
+      <#> updateGraph { currentUrl, previousUrl }
+  _ <-
+    ( BrowseGraph.Graph.toSpec graph
+        # (\graphSpec -> lift $ BrowseGraph.Web.Storage.Storage.Extra.setItem key graphSpec sessionStorage)
+    )
+  lift $ logShow $ BrowseGraph.Graph.toSpec graph
+  pure unit
+  where
+  updateGraph { currentUrl, previousUrl } graph =
+    graph
+      # BrowseGraph.Graph.insertNode
+          { id: currentUrl
+          , label:
+            { format: { pos: { x: 0.0, y: 0.0 } }
+            , data_: unit
+            }
+          }
+      # ( \x ->
+            if previousUrl /= "" then
+              BrowseGraph.Graph.insertEdge
+                { fromId: previousUrl
+                , toId: currentUrl
+                , label:
+                  { format: { pos: { x: 0.0, y: 0.0 }, points: [] }
+                  , data_: unit
+                  }
+                }
+                x
+            else
+              x
+        )
+
+run' :: ExceptT String Effect Unit
+run' = do
   window <- lift $ Web.HTML.window
   document <- lift $ Web.HTML.Window.document window
   sessionStorage <- lift $ Web.HTML.Window.sessionStorage window
