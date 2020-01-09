@@ -52,6 +52,7 @@ lib.flatten (builtins.attrValues {
   dev = [
     (import ./unison.nix { })
     jekyll
+    nixfmt
     bundler
     bundix
     # vscode

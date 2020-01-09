@@ -1,13 +1,24 @@
 { pkgs }:
 let
-  extensions = with pkgs.vscode-extensions; pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-    {
-      name = "code-runner";
-      publisher = "formulahendry";
-      version = "0.6.33";
-      sha256 = "166ia73vrcl5c9hm4q1a73qdn56m0jc7flfsk5p5q41na9f10lb0";
-    }];
-in
-  pkgs.vscode-with-extensions.override {
-      vscodeExtensions = extensions;
-    }
+  extensions = with pkgs.vscode-extensions;
+    [ bbenoist.Nix ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+      {
+        name = "nixfmt-vscode";
+        publisher = "brettm12345";
+        version = "0.0.1";
+        sha256 = "07w35c69vk1l6vipnq3qfack36qcszqxn8j3v332bl0w6m02aa7k";
+      }
+      {
+        name = "ide-purescript";
+        publisher = "nwolverson";
+        version = "0.20.8";
+        sha256 = "16avxmb1191l641r6pd99lw2cgq8gdfipb9n7d0czx1g9vfjr3ip";
+      }
+      {
+        name = "vscode-purty";
+        publisher = "mvakula";
+        version = "0.4.1";
+        sha256 = "021r5cg6h229d2gfgd5a06iy0w5fw9563vxpfcs045nn559xpwxr";
+      }
+    ];
+in pkgs.vscode-with-extensions.override { vscodeExtensions = extensions; }
