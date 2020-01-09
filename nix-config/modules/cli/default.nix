@@ -7,8 +7,11 @@ in
     ./prompt-init.nix
     ../tmp-files.nix
     ./users.nix
+    ../cachix.nix
   ];
 
+ systemd.services.cachix-daemon.enable = true;
+  
   services.tmp-files.enable = true;
 
   time.timeZone = "Europe/Berlin";

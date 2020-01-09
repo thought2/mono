@@ -54,7 +54,8 @@ lib.flatten (builtins.attrValues {
     jekyll
     bundler
     bundix
-    vscode
+    # vscode
+    (import ./vscode-custom.nix { inherit pkgs; })
     atom
     franz
     jetbrains.idea-community

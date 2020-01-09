@@ -9,7 +9,7 @@ let
 
   easy-purescript = import sources.easy-purescript-nix { };
 in rec {
-
+  # vscode = import ../pkgs/vscode-custom.nix { pkgs = self; };
   purs = easy-purescript.purs;
   spago = easy-purescript.spago;
   spago2nix = import sources.spago2nix { };
