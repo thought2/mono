@@ -15,6 +15,15 @@ in rec {
   spago2nix = import sources.spago2nix { };
   purty = easy-purescript.purty;
 
+  idris = (import sources."nixpkgs-master" { }).idris2;
+
+  mongodb = with super;
+    super.callPackage ./mongodb {
+      sasl = cyrus_sasl;
+      boost = boost160;
+      inherit (darwin.apple_sdk.frameworks) Security;
+    };
+
   chamber = super.latestMaster.buildGoModule rec {
     name = "chamber-${version}";
     version = "2.3.2";

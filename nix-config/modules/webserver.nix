@@ -83,7 +83,10 @@ let
   };
 
   locationsPublic = {
-    "~ ^/blog(?:/(.*))?$" = {
+    "~ ^/foo(?:/(.+))?$" = {
+       alias = webDirs.loremPicsum + "/$1";
+    };
+   /* "~ ^/blog(?:/(.*))?$" = {
       alias = webDirs.blog + "/$1";
     };
     "~ ^/landing(?:/(.*))?$" = {
@@ -92,6 +95,7 @@ let
     "~ ^/lorem-picsum(?:/(.*))?$" = {
       alias = webDirs.loremPicsum + "/$1";
     };
+    */
   };
 
   locationsPrivate = {
@@ -109,21 +113,21 @@ in
   services.nginx.appendHttpConfig = ''
     server_names_hash_bucket_size 64;
   '';
-
+/*
   services.nginx.virtualHosts."thought2.de" = {
     addSSL = true;
     enableACME = true;
     root = webDirs.landing;
     locations = locationsPublic;
   };
-
+*/
   services.nginx.virtualHosts."localhost" = {
-    addSSL = true;
-    enableACME = true;
+    addSSL = false;
+    enableACME = false;
     root = webDirs.landing;
-    locations = locationsPublic // locationsPrivate;
+    locations = locationsPublic; # // locationsPrivate;
   };
-
+/*
   services.nginx.virtualHosts."admin.localhost" = {
     addSSL = true;
     enableACME = true;
@@ -147,4 +151,6 @@ in
     locations = locationsPublic // locationsPrivate;
     basicAuthFile = "/etc/.htpasswd";
   };
+
+*/
 }

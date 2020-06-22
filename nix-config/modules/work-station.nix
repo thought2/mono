@@ -2,20 +2,14 @@
 
 let
   systemPkgs = import ../pkgs/base.nix { inherit pkgs; };
-  shorthands = import ../pkgs/shorthands.nix { inherit pkgs; inherit config; };
-in
+  shorthands = import ../pkgs/shorthands.nix {
+    inherit pkgs;
+    inherit config;
+  };
 
-with pkgs;
-with lib;
-{
-  imports = [
-    ./cli
-    ./git.nix
-    ./emacs
-    ./extra-pkgs.nix
-    ./dunst
-    ./chromium
-  ];
+in with pkgs;
+with lib; {
+  imports = [ ./cli ./git.nix ./emacs ./extra-pkgs.nix ./dunst ./chromium ];
 
   networking.networkmanager.enable = true;
 
@@ -33,7 +27,7 @@ with lib;
     exportConfiguration = true;
     xkbVariant = "altgr-intl";
     xkbOptions = "ctrl:nocaps, eurosign:e, compose:ralt";
-#    xkbOptions = "eurosign:e,caps:none, keypad:pointerkeys";
+    #    xkbOptions = "eurosign:e,caps:none, keypad:pointerkeys";
 
     displayManager = {
       sessionCommands = ''
@@ -51,10 +45,15 @@ with lib;
         ${pkgs.xmonad}/bin/xmonad &
         waitPID=$!
       '';
-      }];
+    }];
   };
 
+  virtualisation.docker.enable = true;
+
   services.xserver.desktopManager.gnome3.enable = true;
+
+  services.mongodb.enable = true;
+  services.mongodb.package = pkgs.mongodb-4_0;
 
   # services.xserver.displayManager.lightdm = {
   #   enable = true;
@@ -73,7 +72,7 @@ with lib;
 
   sound.mediaKeys.enable = true;
 
-  environment.systemPackages = systemPkgs ++ builtins.attrValues(shorthands);
+  environment.systemPackages = systemPkgs ++ builtins.attrValues (shorthands);
 
   environment.etc.Xmodmap.text = ''
     ! a key
@@ -85,11 +84,10 @@ with lib;
 
   '';
 
-  powerManagement.resumeCommands =
-    ''
-      # i3lock: Could not connect to X11, maybe you need to set DISPLAY?
-      # ${pkgs.i3lock}/bin/i3lock
-    '';
+  powerManagement.resumeCommands = ''
+    # i3lock: Could not connect to X11, maybe you need to set DISPLAY?
+    # ${pkgs.i3lock}/bin/i3lock
+  '';
 
   # services.redshift = {
   #   enable = true;

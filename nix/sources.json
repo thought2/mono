@@ -5,10 +5,10 @@
         "homepage": "",
         "owner": "justinwoo",
         "repo": "easy-purescript-nix",
-        "rev": "aa94aeac3a6ad9b4dfa0e807ad1421097d74f663",
-        "sha256": "1kfhi6rscgf165zg4f1s0fgppygisvc7dppxb93n02rypxfxjirm",
+        "rev": "0ba91d9aa9f7421f6bfe4895677159a8a999bf20",
+        "sha256": "1baq7mmd3vjas87f0gzlq83n2l1h3dlqajjqr7fgaazpa9xgzs7q",
         "type": "tarball",
-        "url": "https://github.com/justinwoo/easy-purescript-nix/archive/aa94aeac3a6ad9b4dfa0e807ad1421097d74f663.tar.gz",
+        "url": "https://github.com/justinwoo/easy-purescript-nix/archive/0ba91d9aa9f7421f6bfe4895677159a8a999bf20.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "monorepo-tools": {
@@ -45,6 +45,18 @@
         "sha256": "1d90yrhc3i0d940rc0zkm7c1rx3v7nn9rzpbzxm11vqaa3v8y37x",
         "type": "tarball",
         "url": "https://github.com/NixOS/nixpkgs-channels/archive/ef8c34c4721761af0a9258129cad55be5bd9c696.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixpkgs-master": {
+        "branch": "master",
+        "description": "Nix Packages collection",
+        "homepage": null,
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "f71490bd1d0ad95cda667e55f121cee2953cf8be",
+        "sha256": "0afxhbl66kyrzzvbqq9yh089bqnh7lmcnc5lrdw1ppg20y4lvkqy",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/f71490bd1d0ad95cda667e55f121cee2953cf8be.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "spago2nix": {

@@ -103,7 +103,7 @@ lib.flatten (builtins.attrValues {
     node2nixPkgs.chalk-cli
     nodePackages.typescript
     # haskellPackages.idris
-    haskellPackages.stylish-haskell
+    # haskellPackages.stylish-haskell
     yarn
     chromedriver
     gitAndTools.gitflow
@@ -134,6 +134,8 @@ lib.flatten (builtins.attrValues {
     spago
     spago2nix
     purty
+    idris
+    mongodb-4_0
   ];
 
   gfx = [ blender imagemagick gimp graphviz ];
@@ -195,7 +197,9 @@ lib.flatten (builtins.attrValues {
 
   crypto = [ gnupg ];
 
-  vm = [ virtualbox ];
+  vm = [
+    # virtualbox
+  ];
 
   security = [ clamav ];
 
